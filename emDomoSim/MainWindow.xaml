@@ -1,0 +1,36 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Themes="clr-namespace:Microsoft.Windows.Themes;assembly=PresentationFramework.Aero" x:Class="WpfTest.MainWindow"
+        Title="Weather Simulator" Height="350" Width="525">
+    <Window.Resources>
+        <LinearGradientBrush x:Key="TextBoxBorder" EndPoint="0,20" MappingMode="Absolute" StartPoint="0,0">
+            <GradientStop Color="#ABADB3" Offset="0.05"/>
+            <GradientStop Color="#E2E3EA" Offset="0.07"/>
+            <GradientStop Color="#E3E9EF" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Resources>
+    <Grid>
+        <Menu x:Name="menu1" Margin="0,0,0,287" >
+            <MenuItem Header="File">
+                <MenuItem Header="Run" HorizontalAlignment="Left" Width="145" Click="Run_Click" InputGestureText="F5"/>
+                <MenuItem Header="Exit" HorizontalAlignment="Left" Width="145" Click="Exit_Click" InputGestureText="Alt-F4"/>
+            </MenuItem>
+        </Menu>
+        <TextBox x:Name="minTemp" HorizontalAlignment="Left" Height="26" Margin="166,39,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Width="35"/>
+        <TextBox x:Name="maxTemp" HorizontalAlignment="Left" Height="26" Margin="166,67,0,0" TextWrapping="Wrap" Text="16" VerticalAlignment="Top" Width="35"/>
+        <Label Content="Minimal temperature:" HorizontalAlignment="Left" Height="26" Margin="0,39,0,0" VerticalAlignment="Top" Width="161"/>
+        <Label Content="Maximal temperature:" HorizontalAlignment="Left" Height="26" Margin="0,67,0,0" VerticalAlignment="Top" Width="161"/>
+        <Button x:Name="Simulate" Content="Simulate" HorizontalAlignment="Left" Margin="25,148,0,0" VerticalAlignment="Top" Width="75" Click="Simulate_Click"/>
+        <Slider HorizontalAlignment="Left" Minimum="0" Maximum="24" Margin="100,204,0,0" VerticalAlignment="Top" Width="218" ValueChanged="Time_ValueChanged"/>
+        <TextBox x:Name="minTempTime" HorizontalAlignment="Left" Height="26" Margin="312,39,0,0" TextWrapping="Wrap" Text="5:00" VerticalAlignment="Top" Width="45"/>
+        <TextBox x:Name="maxTempTime" HorizontalAlignment="Left" Height="26" Margin="312,67,0,0" TextWrapping="Wrap" Text="15:00" VerticalAlignment="Top" Width="45"/>
+        <Label Content="Time:" HorizontalAlignment="Left" Height="26" Margin="262,39,0,0" VerticalAlignment="Top" Width="45"/>
+        <Label Content="Time:" HorizontalAlignment="Left" Height="26" Margin="262,67,0,0" VerticalAlignment="Top" Width="45"/>
+        <Label Content="Current time:" HorizontalAlignment="Left" Height="26" Margin="0,240,0,0" VerticalAlignment="Top" Width="161"/>
+        <TextBlock x:Name="curTime" HorizontalAlignment="Left" Margin="193,240,0,0" TextWrapping="Wrap" Text="6:30" VerticalAlignment="Top" Height="26"/>
+        <Label Content="Current temperature:" HorizontalAlignment="Left" Height="26" Margin="0,271,0,0" VerticalAlignment="Top" Width="161"/>
+        <TextBlock x:Name="curTemp" HorizontalAlignment="Left" Margin="193,271,0,0" TextWrapping="Wrap" Text="9" VerticalAlignment="Top" Height="26"/>
+
+    </Grid>
+</Window>

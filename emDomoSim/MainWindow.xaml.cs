@@ -85,7 +85,7 @@ namespace WpfTest
 
       double curTempV = minTempV + (maxTempV - minTempV) * tempFactor;
 
-      TimeSpan ts= System.TimeSpan.FromHours(time);
+      TimeSpan ts= TimeSpan.FromHours(time);
       curTime.Text = ts.ToString(@"hh\:mm");
       curTemp.Text = curTempV.ToString("0.0");
     }
@@ -109,7 +109,6 @@ namespace WpfTest
     {
       // http://stackoverflow.com/a/5095972/16673
       double to_r = Math.PI / 180.0;
-      double to_d = 180.0/Math.PI;
       double latitude = 45.0*to_r;
 
 
@@ -142,10 +141,18 @@ namespace WpfTest
         new MonthlyTemp (0, 2.5, 6 ),
         new MonthlyTemp (-3.5, 0, 2.5 ),
       };
-      double day = Convert.ToDouble(dayInYear.Text);
-      double month = day * 12 / 365 - 0.5;
-      int prev = (int)Math.Floor(month);
-      double nextFactor = month-prev;
+      double day = 180;
+      try
+      {
+        DateTime date = new DateTime(2000, Convert.ToInt16(month.Text), Convert.ToInt16(dayInMonth.Text));
+        day = date.DayOfYear;
+      }
+      catch
+      {
+      }
+      double monthVal = day * 12 / 365 - 0.5;
+      int prev = (int)Math.Floor(monthVal);
+      double nextFactor = monthVal-prev;
       int next = prev + 1;
       if (prev < 0) prev += monthly.Length;
       if (next >= monthly.Length) next -= monthly.Length;
@@ -156,8 +163,8 @@ namespace WpfTest
       double minTime = sunTimes.rise;
       double maxTime = (12+sunTimes.set) *0.5;
 
-      minTempTime.Text = System.TimeSpan.FromHours(minTime).ToString(@"hh\:mm");
-      maxTempTime.Text = System.TimeSpan.FromHours(maxTime).ToString(@"hh\:mm");
+      minTempTime.Text = TimeSpan.FromHours(minTime).ToString(@"hh\:mm");
+      maxTempTime.Text = TimeSpan.FromHours(maxTime).ToString(@"hh\:mm");
     }
   }
 }

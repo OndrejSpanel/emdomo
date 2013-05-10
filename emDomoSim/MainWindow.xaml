@@ -31,9 +31,11 @@
         <TextBlock x:Name="curTime" HorizontalAlignment="Left" Margin="203,359,0,0" TextWrapping="Wrap" Text="6:30" VerticalAlignment="Top" Height="26"/>
         <Label Content="Current temperature:" HorizontalAlignment="Left" Height="26" Margin="10,390,0,0" VerticalAlignment="Top" Width="161"/>
         <TextBlock x:Name="curTemp" HorizontalAlignment="Left" Margin="203,390,0,0" TextWrapping="Wrap" Text="9" VerticalAlignment="Top" Height="26"/>
-        <TextBox x:Name="dayInYear" HorizontalAlignment="Left" Height="26" Margin="176,58,0,0" TextWrapping="Wrap" Text="60" VerticalAlignment="Top" Width="35"/>
-        <Label Content="Day in year:" HorizontalAlignment="Left" Height="26" Margin="10,58,0,0" VerticalAlignment="Top" Width="161"/>
+        <TextBox x:Name="month" HorizontalAlignment="Left" Height="26" Margin="76,58,0,0" TextWrapping="Wrap" Text="5" VerticalAlignment="Top" Width="35"/>
+        <Label Content="Month:" HorizontalAlignment="Left" Height="26" Margin="10,58,0,0" VerticalAlignment="Top" Width="61"/>
         <Button x:Name="SetWeather" Content="Set weather" HorizontalAlignment="Left" Margin="35,98,0,0" VerticalAlignment="Top" Width="75" Click="SetWeather_Click"/>
+        <TextBox x:Name="dayInMonth" HorizontalAlignment="Left" Height="26" Margin="176,58,0,0" TextWrapping="Wrap" Text="15" VerticalAlignment="Top" Width="35" RenderTransformOrigin="-3.457,0.462"/>
+        <Label Content="Day:" HorizontalAlignment="Left" Height="26" Margin="125,58,0,0" VerticalAlignment="Top" Width="46"/>
 
     </Grid>
 </Window>

@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
 
 namespace emDomoSim
 {
@@ -67,32 +68,65 @@ namespace emDomoSim
 
     RoomSimulator room_;
 
+    AutoResetEvent cancel_;
+
+    Thread simulation_;
+
     public MainWindow()
     {
       InitializeComponent();
       fanControl_ = new FanControl();
       room_ = new RoomSimulator();
+      cancel_ = new AutoResetEvent(false);
+    }
+
+    private void CancelSimulation()
+    {
+      if (simulation_ != null)
+      {
+        Trace.WriteLine("Cancel");
+        cancel_.Set(); // TODO: avoid race
+        simulation_.Join();
+        cancel_.Reset();
+        Trace.WriteLine("Canceled");
+      }
     }
 
     private void Run_Click(object sender, RoutedEventArgs e)
     {
+      CancelSimulation();
 
       // The Work to perform on another thread
       ThreadStart start = delegate()
       {
+        Trace.WriteLine("Started");
         // move time from left to right
         for (double f = 0; f < 24; f += 0.05)
         {
-          Dispatcher.Invoke(delegate()
+          Trace.WriteLine(String.Format("sim {0}", f));
+          Dispatcher.BeginInvoke((Action)delegate()
           {
             time.Value = f;
           });
-          System.Threading.Thread.Sleep(20);
+          if (cancel_.WaitOne(20))
+          {
+            Trace.WriteLine("Cancel received");
+            break;
+          }
         }
+        Trace.WriteLine("Ending");
+        simulation_ = null;
+        Trace.WriteLine("Ended");
       };
 
       // Create the thread and kick it started!
-      new Thread(start).Start();
+      simulation_ = new Thread(start);
+      simulation_.Start();
+    }
+    protected override void OnClosed(EventArgs e)
+    {
+      CancelSimulation();
+      base.OnClosed(e);
     }
     private void Exit_Click(object sender, RoutedEventArgs e)
     {
@@ -122,11 +156,9 @@ namespace emDomoSim
 
       TimeSpan ts= TimeSpan.FromHours(time);
       curTime.Text = ts.ToString(@"hh\:mm");
-      curTemp.Text = roomState.curTemp.ToString("0.0");
-    }
-
-    private void SetWeather_Click(object sender, RoutedEventArgs e)
-    {
+      curTemp.Text = roomState.curTemp.ToString("f1");
+      minTemp.Text = roomState.minTemp.ToString("f1");
+      maxTemp.Text = roomState.maxTemp.ToString("f1");
     }
   }
 }

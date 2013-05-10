@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,14 +28,23 @@ namespace WpfTest
 
     private void Run_Click(object sender, RoutedEventArgs e)
     {
-      // move time from left to right
-      for (double f = 0; f < 24; f += 0.1)
-      {
-        // TODO: timer based solution instead
-        //System.Threading.Thread.Sleep(50);
-        time.Value = f;
-      }
 
+      // The Work to perform on another thread
+      ThreadStart start = delegate()
+      {
+        // move time from left to right
+        for (double f = 0; f < 24; f += 0.05)
+        {
+          Dispatcher.Invoke(delegate()
+          {
+            time.Value = f;
+          });
+          System.Threading.Thread.Sleep(20);
+        }
+      };
+
+      // Create the thread and kick it started!
+      new Thread(start).Start();
     }
     private void Exit_Click(object sender, RoutedEventArgs e)
     {
@@ -43,7 +53,7 @@ namespace WpfTest
 
     private void Simulate_Click(object sender, RoutedEventArgs e)
     {
-      Run_Click(sender, e);
+      Run_Click(sender, e); //
     }
 
     private void Time_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

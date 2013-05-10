@@ -157,8 +157,8 @@ namespace WpfTest
       if (prev < 0) prev += monthly.Length;
       if (next >= monthly.Length) next -= monthly.Length;
       MonthlyTemp temp = monthly[prev] * (1 - nextFactor) + monthly[next] * nextFactor;
-      minTemp.Text = temp.min.ToString("f2");
-      maxTemp.Text = temp.max.ToString("f2");
+      minTemp.Text = temp.min.ToString("f1");
+      maxTemp.Text = temp.max.ToString("f1");
       SunTimes sunTimes = ComputeSunTimes(day);
       double minTime = sunTimes.rise;
       double maxTime = (12+sunTimes.set) *0.5;

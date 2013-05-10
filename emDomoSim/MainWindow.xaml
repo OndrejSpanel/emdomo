@@ -22,14 +22,14 @@
         <TextBox x:Name="dayInMonth" HorizontalAlignment="Left" Height="26" Margin="176,58,0,0" TextWrapping="Wrap" Text="15" VerticalAlignment="Top" Width="35" RenderTransformOrigin="-3.457,0.462"/>
         <Label Content="Day:" HorizontalAlignment="Left" Height="26" Margin="125,58,0,0" VerticalAlignment="Top" Width="46"/>
         <Button x:Name="SetWeather" Content="Set weather" HorizontalAlignment="Left" Margin="35,98,0,0" VerticalAlignment="Top" Width="75" Click="SetWeather_Click"/>
-        <TextBox x:Name="minTemp" HorizontalAlignment="Left" Height="26" Margin="176,158,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Width="35"/>
-        <TextBox x:Name="maxTemp" HorizontalAlignment="Left" Height="26" Margin="176,186,0,0" TextWrapping="Wrap" Text="16" VerticalAlignment="Top" Width="35"/>
+        <TextBlock x:Name="minTemp" HorizontalAlignment="Left" Height="26" Margin="176,158,0,0" TextWrapping="Wrap" Text="8" VerticalAlignment="Top" Width="35"/>
+        <TextBlock x:Name="maxTemp" HorizontalAlignment="Left" Height="26" Margin="176,186,0,0" TextWrapping="Wrap" Text="16" VerticalAlignment="Top" Width="35"/>
         <Label Content="Minimal temperature:" HorizontalAlignment="Left" Height="26" Margin="10,158,0,0" VerticalAlignment="Top" Width="161"/>
         <Label Content="Maximal temperature:" HorizontalAlignment="Left" Height="26" Margin="10,186,0,0" VerticalAlignment="Top" Width="161"/>
         <Button x:Name="Simulate" Content="Simulate" HorizontalAlignment="Left" Margin="36,233,0,0" VerticalAlignment="Top" Width="75" Click="Simulate_Click"/>
         <Slider x:Name="time" HorizontalAlignment="Left" Minimum="0" Maximum="24" Margin="112,264,0,0" VerticalAlignment="Top" Width="218" ValueChanged="Time_ValueChanged"/>
-        <TextBox x:Name="minTempTime" HorizontalAlignment="Left" Height="26" Margin="322,158,0,0" TextWrapping="Wrap" Text="5:00" VerticalAlignment="Top" Width="45"/>
-        <TextBox x:Name="maxTempTime" HorizontalAlignment="Left" Height="26" Margin="322,186,0,0" TextWrapping="Wrap" Text="15:00" VerticalAlignment="Top" Width="45"/>
+        <TextBlock x:Name="minTempTime" HorizontalAlignment="Left" Height="26" Margin="322,158,0,0" TextWrapping="Wrap" Text="5:00" VerticalAlignment="Top" Width="45"/>
+        <TextBlock x:Name="maxTempTime" HorizontalAlignment="Left" Height="26" Margin="322,186,0,0" TextWrapping="Wrap" Text="15:00" VerticalAlignment="Top" Width="45"/>
         <Label Content="Time:" HorizontalAlignment="Left" Height="26" Margin="272,158,0,0" VerticalAlignment="Top" Width="45"/>
         <Label Content="Time:" HorizontalAlignment="Left" Height="26" Margin="272,186,0,0" VerticalAlignment="Top" Width="45"/>
         <Label Content="Current time:" HorizontalAlignment="Left" Height="26" Margin="12,300,0,0" VerticalAlignment="Top" Width="161"/>

@@ -119,7 +119,7 @@ namespace emDomoSim
     {
       // http://stackoverflow.com/a/5095972/16673
       double to_r = Math.PI / 180.0;
-      double latitude = 45.0*to_r;
+      double latitude = 50.0*to_r;
 
 
       //double et = -7.633 * Math.Sin(dayInYear * (2 * Math.PI)/365.24) + 9.65 * Math.Sin((dayInYear - 78) * 180/92 * to_r);

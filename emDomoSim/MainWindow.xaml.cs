@@ -14,7 +14,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace WpfTest
+namespace emDomoSim
 {
   /// <summary>
   /// Interaction logic for MainWindow.xaml

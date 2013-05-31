@@ -71,12 +71,12 @@ namespace emDomoSim
         float houseTemperature = 20;
         float houseWeight = 0.7f;
         float ambientTemperature = (weather.curTemp * (1 - houseWeight) + houseTemperature * houseWeight);
-        result.roomTemperature_ += (ambientTemperature - result.roomTemperature_) * 0.0125f * deltaT;
+        result.roomTemperature_ += (ambientTemperature - result.roomTemperature_) * 0.007f * deltaT;
         state_ = result;
         fan_.Simulate(deltaT, this);
         if (fan_.FanStatus())
         {
-          result.roomTemperature_ += (weather.curTemp - result.roomTemperature_)*0.0125f*deltaT;
+          result.roomTemperature_ += (weather.curTemp - result.roomTemperature_)*0.02f*deltaT;
         }
         return result;
       }

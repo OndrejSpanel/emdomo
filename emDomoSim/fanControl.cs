@@ -9,8 +9,11 @@ namespace emDomoSim
   class FanControl
   {
     bool fan_;
-    float tempOn = 10;
-    float tempOff = 12;
+
+    const float roomTempOn = 9;
+    const float roomTempOff = 8;
+    const float tempDiffOn = 5;
+    const float tempDiffOff = 3;
 
     public interface Input
     {
@@ -27,16 +30,18 @@ namespace emDomoSim
     }
     public void Simulate(float deltaT, Input input)
     {
+      float roomTemp = input.GetRoomTemperature();
+      float outTemp = input.GetOutsideTemperature();
       if (fan_)
       {
-        if (input.GetOutsideTemperature() > tempOff)
+        if (roomTemp < roomTempOff || roomTemp - outTemp < tempDiffOff)
         {
           fan_ = false;
         }
       }
       else
       {
-        if (input.GetOutsideTemperature() < tempOn)
+        if (roomTemp > roomTempOn && roomTemp - outTemp > tempDiffOn)
         {
           fan_ = true;
         }

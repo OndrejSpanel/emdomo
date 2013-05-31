@@ -27,6 +27,7 @@ namespace emDomoSim
       int dayInYear_;
       float timeOfDay_; //  in hours
 
+      FanControl fan_ = new FanControl();
       WeatherSim weatherSim_ = new WeatherSim();
       State state_ = new State();
 
@@ -70,29 +71,34 @@ namespace emDomoSim
         float houseTemperature = 20;
         float houseWeight = 0.7f;
         float ambientTemperature = (weather.curTemp * (1 - houseWeight) + houseTemperature * houseWeight);
-        result.roomTemperature_ += (ambientTemperature - result.roomTemperature_) * 0.05f * deltaT;
+        result.roomTemperature_ += (ambientTemperature - result.roomTemperature_) * 0.0125f * deltaT;
         state_ = result;
+        fan_.Simulate(deltaT, this);
+        if (fan_.FanStatus())
+        {
+          result.roomTemperature_ += (weather.curTemp - result.roomTemperature_)*0.0125f*deltaT;
+        }
         return result;
       }
 
       public float GetOutsideTemperature() { return state_.curTemp; }
       public float GetRoomTemperature() { return state_.roomTemperature_; }
+
+      internal bool FanStatus()
+      {
+        return fan_.FanStatus();
+      }
     };
 
-    FanControl fanControl_;
+    RoomSimulator room_ = new RoomSimulator();
 
-    RoomSimulator room_;
-
-    AutoResetEvent cancel_;
+    AutoResetEvent cancel_ = new AutoResetEvent(false);
 
     Thread simulation_;
 
     public MainWindow()
     {
       InitializeComponent();
-      fanControl_ = new FanControl();
-      room_ = new RoomSimulator();
-      cancel_ = new AutoResetEvent(false);
     }
 
     private void CancelSimulation()
@@ -167,8 +173,7 @@ namespace emDomoSim
       }
       float deltaT = room_.SetTime(dayInYear, time);
       RoomSimulator.State roomState = room_.Simulate(deltaT);
-      fanControl_.Simulate(deltaT,room_);
-      fanStatus.Text = fanControl_.FanStatus() ? "On" : "Off";
+      fanStatus.Text = room_.FanStatus() ? "On" : "Off";
       TimeSpan ts= TimeSpan.FromHours(time);
       curTime.Text = ts.ToString(@"hh\:mm");
       curTemp.Text = roomState.curTemp.ToString("f1");

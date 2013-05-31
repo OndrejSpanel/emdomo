@@ -129,8 +129,8 @@ namespace emDomoSim
 
     private void DoSimulateDay()
     {
+      time.IsEnabled = false;
       CancelSimulation();
-
       // The Work to perform on another thread
       ThreadStart start = delegate()
       {
@@ -139,10 +139,7 @@ namespace emDomoSim
         for (double f = 0; f < 24; f += 0.05)
         {
           Trace.WriteLine(String.Format("sim {0}", f));
-          Dispatcher.BeginInvoke((Action)delegate()
-          {
-            time.Value = f;
-          });
+          Dispatcher.BeginInvoke((Action)delegate() {time.Value = f;});
           if (cancel_.WaitOne(20))
           {
             Trace.WriteLine("Cancel received");
@@ -152,6 +149,9 @@ namespace emDomoSim
         Trace.WriteLine("Ending");
         simulation_ = null;
         Trace.WriteLine("Ended");
+
+        Dispatcher.BeginInvoke((Action)delegate() { time.IsEnabled = true;});
+
       };
 
       // Create the thread and kick it started!

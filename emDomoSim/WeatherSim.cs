@@ -72,6 +72,10 @@ namespace emDomoSim
       public Weather() { }
       public Weather(Weather w)
       {
+        SetWeather(w);
+      }
+      public void SetWeather(WeatherSim.Weather w)
+      {
         minTemp = w.minTemp;
         maxTemp = w.maxTemp;
         minTempTime = w.minTempTime;
@@ -114,11 +118,11 @@ namespace emDomoSim
       else
       {
         // assume sinus between maxTime and minTime+24
-        double timeFactor = (timeOfDay - result.minTempTime) / (result.minTempTime+24 - result.maxTempTime);
+        double timeFactor = (timeOfDay - result.maxTempTime) / (result.minTempTime+24 - result.maxTempTime);
         tempFactor = Math.Sin((timeFactor - 0.5) * Math.PI) * -0.5 + 0.5;
       }
 
-      result.curTemp = (float)(result.minTempTime + (result.maxTempTime - result.minTempTime) * tempFactor);
+      result.curTemp = (float)(result.minTemp + (result.maxTemp - result.minTemp) * tempFactor);
       return result;
     }
 

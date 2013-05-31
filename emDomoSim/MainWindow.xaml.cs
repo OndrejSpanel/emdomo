@@ -25,14 +25,13 @@ namespace emDomoSim
     public class RoomSimulator : FanControl.Input
     {
       int dayInYear_;
-      float timeOfDay_;
+      float timeOfDay_; //  in hours
 
-      WeatherSim weatherSim_;
-      State state_;
+      WeatherSim weatherSim_ = new WeatherSim();
+      State state_ = new State();
 
       public RoomSimulator()
       {
-        weatherSim_ = new WeatherSim();
       }
 
       public class State: WeatherSim.Weather
@@ -43,19 +42,35 @@ namespace emDomoSim
         {
           roomTemperature_ = 15;
         }
-        public State(WeatherSim.Weather w) : base(w)
+        public State(State w)
+          : base(w)
         {
-          roomTemperature_ = 15;
+          roomTemperature_ = w.roomTemperature_;
         }
 
-        public void SetBase(WeatherSim.Weather w) {}
       }
 
-      public void SetTime(int dayInYear, float timeOfDay) { dayInYear_ = dayInYear; timeOfDay_ = timeOfDay; }
-      public State Simulate()
+      public float SetTime(int dayInYear, float timeOfDay)
+      {
+        const float maxDelta = 0.2f;
+        float delta = timeOfDay - timeOfDay_;
+        if (dayInYear_ != dayInYear) delta = 0;
+        else if (delta < 0) delta = 0;
+        else if (delta > maxDelta) delta = maxDelta;
+        dayInYear_ = dayInYear;
+        timeOfDay_ = timeOfDay;
+        return delta;
+      }
+      public State Simulate(float deltaT)
       {
         WeatherSim.Weather weather = weatherSim_.Simulate(dayInYear_, timeOfDay_);
-        State result = new State(weather);
+        State result = new State(state_);
+        result.SetWeather(weather);
+        // simulate how the room responds
+        float houseTemperature = 20;
+        float houseWeight = 0.7f;
+        float ambientTemperature = (weather.curTemp * (1 - houseWeight) + houseTemperature * houseWeight);
+        result.roomTemperature_ += (ambientTemperature - result.roomTemperature_) * 0.05f * deltaT;
         state_ = result;
         return result;
       }
@@ -150,15 +165,16 @@ namespace emDomoSim
       catch
       {
       }
-
-      room_.SetTime(dayInYear, time);
-      RoomSimulator.State roomState = room_.Simulate();
-
+      float deltaT = room_.SetTime(dayInYear, time);
+      RoomSimulator.State roomState = room_.Simulate(deltaT);
+      fanControl_.Simulate(deltaT,room_);
+      fanStatus.Text = fanControl_.FanStatus() ? "On" : "Off";
       TimeSpan ts= TimeSpan.FromHours(time);
       curTime.Text = ts.ToString(@"hh\:mm");
       curTemp.Text = roomState.curTemp.ToString("f1");
       minTemp.Text = roomState.minTemp.ToString("f1");
       maxTemp.Text = roomState.maxTemp.ToString("f1");
+      roomTemp.Text = roomState.roomTemperature_.ToString("f1");
     }
   }
 }

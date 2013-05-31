@@ -115,6 +115,20 @@ namespace emDomoSim
 
     private void Run_Click(object sender, RoutedEventArgs e)
     {
+      SimulateDay_Click(sender, e); //
+    }
+    protected override void OnClosed(EventArgs e)
+    {
+      CancelSimulation();
+      base.OnClosed(e);
+    }
+    private void Exit_Click(object sender, RoutedEventArgs e)
+    {
+      Close();
+    }
+
+    private void DoSimulateDay()
+    {
       CancelSimulation();
 
       // The Work to perform on another thread
@@ -144,19 +158,36 @@ namespace emDomoSim
       simulation_ = new Thread(start);
       simulation_.Start();
     }
-    protected override void OnClosed(EventArgs e)
+
+    private void SimulateDay_Click(object sender, RoutedEventArgs e)
     {
-      CancelSimulation();
-      base.OnClosed(e);
-    }
-    private void Exit_Click(object sender, RoutedEventArgs e)
-    {
-      Close();
+      DoSimulateDay();
     }
 
-    private void Simulate_Click(object sender, RoutedEventArgs e)
+    private void SimulateMonth_Click(object sender, RoutedEventArgs e)
     {
-      Run_Click(sender, e); //
+      DoSimulateDay();
+    }
+
+    private void SimulateYear_Click(object sender, RoutedEventArgs e)
+    {
+      DoSimulateDay();
+    }
+
+    /**
+    fimeFrom / timeTo - time in day in hours
+    */
+    private void SimulateTo(int dayInYear, float time)
+    {
+      float deltaT = room_.SetTime(dayInYear, time);
+      RoomSimulator.State roomState = room_.Simulate(deltaT);
+      fanStatus.Text = room_.FanStatus() ? "On" : "Off";
+      TimeSpan ts = TimeSpan.FromHours(time);
+      curTime.Text = ts.ToString(@"hh\:mm");
+      curTemp.Text = roomState.curTemp.ToString("f1");
+      minTemp.Text = roomState.minTemp.ToString("f1");
+      maxTemp.Text = roomState.maxTemp.ToString("f1");
+      roomTemp.Text = roomState.roomTemperature_.ToString("f1");
     }
 
     private void Time_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
@@ -171,15 +202,8 @@ namespace emDomoSim
       catch
       {
       }
-      float deltaT = room_.SetTime(dayInYear, time);
-      RoomSimulator.State roomState = room_.Simulate(deltaT);
-      fanStatus.Text = room_.FanStatus() ? "On" : "Off";
-      TimeSpan ts= TimeSpan.FromHours(time);
-      curTime.Text = ts.ToString(@"hh\:mm");
-      curTemp.Text = roomState.curTemp.ToString("f1");
-      minTemp.Text = roomState.minTemp.ToString("f1");
-      maxTemp.Text = roomState.maxTemp.ToString("f1");
-      roomTemp.Text = roomState.roomTemperature_.ToString("f1");
+      SimulateTo(dayInYear, time);
     }
+
   }
 }

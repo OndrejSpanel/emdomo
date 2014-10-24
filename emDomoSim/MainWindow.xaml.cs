@@ -62,6 +62,21 @@ namespace emDomoSim
         timeOfDay_ = timeOfDay;
         return delta;
       }
+
+      public State AdvanceTime(float deltaT)
+      {
+        const float oneDay = 24.0f;
+        var ret = Simulate(deltaT);
+        timeOfDay_ += deltaT;
+        while (timeOfDay_>oneDay)
+        {
+          timeOfDay_ -= oneDay;
+          dayInYear_++;
+          if (dayInYear_ >= 366) dayInYear_ = 0;
+        }
+        return ret;
+      }
+
       public State Simulate(float deltaT)
       {
         WeatherSim.Weather weather = weatherSim_.Simulate(dayInYear_, timeOfDay_);
@@ -167,11 +182,36 @@ namespace emDomoSim
 
       // Configure the dialog box
       dlg.Owner = this;
-      dlg.avgRoomTemp.Text = "15.7 °C";
-      dlg.tempOsc.Text = "0.8 °C";
 
-      dlg.fanOnTime.Text = "63 %";
+      int dayInYear = DayInYear();
 
+      var room = new RoomSimulator();
+      room.SetTime(dayInYear, 0);
+
+      int nSamples = 0;
+      float sumTemp = 0;
+      float minTemp = float.MaxValue;
+      float maxTemp = float.MinValue;
+      float sumFanOn = 0;
+
+      float duration = 24.0f;
+      float deltaT = 0.05f;
+
+      for (float t = 0; t < duration; t += deltaT)
+      {
+        RoomSimulator.State roomState = room.AdvanceTime(deltaT);
+        nSamples++;
+        sumTemp += roomState.roomTemperature_;
+        maxTemp = Math.Max(roomState.roomTemperature_, maxTemp);
+        minTemp = Math.Min(roomState.roomTemperature_, minTemp);
+        sumFanOn += (room.FanStatus() ? 1 : 0) * deltaT;
+      }
+
+      dlg.avgRoomTemp.Text = String.Format("{0:0.0} °C",sumTemp/nSamples);
+      dlg.tempOsc.Text = String.Format("{0:0.0} °C", maxTemp - minTemp);
+
+      dlg.fanOnTime.Text = String.Format("{0:0} %", sumFanOn * 100 / duration);
+      
       //dlg.DocumentMargin = this.documentTextBox.Margin;
 
       // Open the dialog box modally 
@@ -204,18 +244,22 @@ namespace emDomoSim
       roomTemp.Text = roomState.roomTemperature_.ToString("f1");
     }
 
-    private void Time_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    private int DayInYear()
     {
-      float time = (float)e.NewValue;
-      int dayInYear = 180;
       try
       {
         DateTime date = new DateTime(2000, Convert.ToInt16(month.Text), Convert.ToInt16(dayInMonth.Text));
-        dayInYear = date.DayOfYear;
+        return date.DayOfYear;
       }
       catch
       {
       }
+      return 180;
+    }
+    private void Time_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+      float time = (float)e.NewValue;
+      int dayInYear = DayInYear();
       SimulateTo(dayInYear, time);
     }
 

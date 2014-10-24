@@ -174,8 +174,10 @@ namespace emDomoSim
       simulation_.Start();
     }
 
-    private void SimulateDay_Click(object sender, RoutedEventArgs e)
+    private void SimulateDays(int days)
     {
+      float duration = 24.0f * days;
+
       //DoSimulateDay();
       // Instantiate the dialog box
       var dlg = new SimulWindow();
@@ -194,7 +196,6 @@ namespace emDomoSim
       float maxTemp = float.MinValue;
       float sumFanOn = 0;
 
-      float duration = 24.0f;
       float deltaT = 0.05f;
 
       for (float t = 0; t < duration; t += deltaT)
@@ -207,25 +208,30 @@ namespace emDomoSim
         sumFanOn += (room.FanStatus() ? 1 : 0) * deltaT;
       }
 
-      dlg.avgRoomTemp.Text = String.Format("{0:0.0} °C",sumTemp/nSamples);
+      dlg.avgRoomTemp.Text = String.Format("{0:0.0} °C", sumTemp / nSamples);
       dlg.tempOsc.Text = String.Format("{0:0.0} °C", maxTemp - minTemp);
 
       dlg.fanOnTime.Text = String.Format("{0:0} %", sumFanOn * 100 / duration);
-      
+
       //dlg.DocumentMargin = this.documentTextBox.Margin;
 
       // Open the dialog box modally 
       dlg.ShowDialog();
     }
 
+    private void SimulateDay_Click(object sender, RoutedEventArgs e)
+    {
+      SimulateDays(1);
+    }
+
     private void SimulateMonth_Click(object sender, RoutedEventArgs e)
     {
-      DoSimulateDay();
+      SimulateDays(30);
     }
 
     private void SimulateYear_Click(object sender, RoutedEventArgs e)
     {
-      DoSimulateDay();
+      SimulateDays(366);
     }
 
     /**

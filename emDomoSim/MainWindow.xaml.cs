@@ -84,7 +84,7 @@ namespace emDomoSim
         result.SetWeather(weather);
         // simulate how the room responds
         float houseTemperature = 20;
-        float houseWeight = 0.7f;
+        float houseWeight = 0.9f;
         float ambientTemperature = (weather.curTemp * (1 - houseWeight) + houseTemperature * houseWeight);
         result.roomTemperature_ += (ambientTemperature - result.roomTemperature_) * 0.007f * deltaT;
         state_ = result;

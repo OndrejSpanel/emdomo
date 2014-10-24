@@ -10,8 +10,8 @@ namespace emDomoSim
   {
     bool fan_;
 
-    const float roomTempOn = 9;
-    const float roomTempOff = 8;
+    const float roomTempOn = 13;
+    const float roomTempOff = 12;
     const float tempDiffOn = 5;
     const float tempDiffOff = 3;
 

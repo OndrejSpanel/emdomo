@@ -161,7 +161,21 @@ namespace emDomoSim
 
     private void SimulateDay_Click(object sender, RoutedEventArgs e)
     {
-      DoSimulateDay();
+      //DoSimulateDay();
+      // Instantiate the dialog box
+      var dlg = new SimulWindow();
+
+      // Configure the dialog box
+      dlg.Owner = this;
+      dlg.avgRoomTemp.Text = "15.7 °C";
+      dlg.tempOsc.Text = "0.8 °C";
+
+      dlg.fanOnTime.Text = "63 %";
+
+      //dlg.DocumentMargin = this.documentTextBox.Margin;
+
+      // Open the dialog box modally 
+      dlg.ShowDialog();
     }
 
     private void SimulateMonth_Click(object sender, RoutedEventArgs e)

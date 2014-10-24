@@ -1,0 +1,21 @@
+﻿<Window x:Class="emDomoSim.SimulWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Simulation Results" Height="302" Width="416" ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <GroupBox Header="Efficiency" Height="65" Margin="23,140,10,0" VerticalAlignment="Top"/>
+
+        <GroupBox Header="Output Quality" Height="92" Margin="21,34,10,0" VerticalAlignment="Top"/>
+        <Button Content="OK" Margin="0,219,10,11" HorizontalAlignment="Right" Width="93" IsDefault="True" IsCancel="True"/>
+        <Label Content="Average room temperature:" HorizontalAlignment="Left" Margin="25,55,0,0" VerticalAlignment="Top" Height="31" Width="185"/>
+        <TextBlock x:Name="avgRoomTemp" HorizontalAlignment="Left" Margin="219,60,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Height="26" Width="99"/>
+        <Label Content="Fan on time:" HorizontalAlignment="Left" Margin="25,158,0,0" VerticalAlignment="Top" Height="31" Width="185"/>
+        <TextBlock x:Name="fanOnTime" HorizontalAlignment="Left" Margin="219,163,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Height="26" Width="99"/>
+        <Label Content="Temperature oscillation:" HorizontalAlignment="Left" Margin="25,86,0,0" VerticalAlignment="Top" Height="31" Width="185"/>
+        <TextBlock x:Name="tempOsc" HorizontalAlignment="Left" Margin="219,91,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Height="26" Width="99"/>
+
+    </Grid>
+</Window>

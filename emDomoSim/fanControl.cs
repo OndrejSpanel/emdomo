@@ -6,7 +6,18 @@ using System.Threading.Tasks;
 
 namespace emDomoSim
 {
-  class FanControl
+  public interface FanControlInput
+  {
+    float GetOutsideTemperature();
+    float GetRoomTemperature();
+  };
+
+  interface FanControl
+  {
+    void Simulate(float deltaT, FanControlInput input);
+    bool FanStatus();
+  }
+  public class FanControlThermostat : FanControl
   {
     bool fan_;
 
@@ -15,12 +26,7 @@ namespace emDomoSim
     const float tempDiffOn = 5;
     const float tempDiffOff = 3;
 
-    public interface Input
-    {
-      float GetOutsideTemperature();
-      float GetRoomTemperature();
-    };
-    public FanControl()
+    public FanControlThermostat()
     {
       Reset();
     }
@@ -28,7 +34,7 @@ namespace emDomoSim
     {
       fan_ = false;
     }
-    public void Simulate(float deltaT, Input input)
+    public void Simulate(float deltaT, FanControlInput input)
     {
       float roomTemp = input.GetRoomTemperature();
       float outTemp = input.GetOutsideTemperature();
@@ -49,9 +55,6 @@ namespace emDomoSim
       }
     }
 
-    public bool FanStatus()
-    {
-      return fan_;
-    }
+    public bool FanStatus() {return fan_;}
   }
 }

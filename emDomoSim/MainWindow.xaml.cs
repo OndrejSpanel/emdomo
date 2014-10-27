@@ -22,12 +22,12 @@ namespace emDomoSim
   /// </summary>
   public partial class MainWindow : Window
   {
-    public class RoomSimulator : FanControl.Input
+    public class RoomSimulator : FanControlInput
     {
       int dayInYear_;
       float timeOfDay_; //  in hours
 
-      FanControl fan_ = new FanControl();
+      FanControlThermostat fan_ = new FanControlThermostat();
       WeatherSim weatherSim_ = new WeatherSim();
       State state_ = new State();
 
@@ -278,5 +278,17 @@ namespace emDomoSim
       SimulateTo(dayInYear, time);
     }
 
+  }
+
+
+  public class MyStrings : List<String>
+  {
+    public MyStrings()
+    {
+      this.Add("Hello");
+      this.Add("Goodbye");
+      this.Add("Heya");
+      this.Add("Cya");
+    }
   }
 }

@@ -35,6 +35,10 @@ namespace emDomoSim
       {
       }
 
+      public void SelectFanControl(string fcName)
+      {
+      
+      }
       public class State : WeatherSim.Weather
       {
         public float roomTemperature_;
@@ -276,6 +280,11 @@ namespace emDomoSim
       float time = (float)e.NewValue;
       int dayInYear = DayInYear();
       SimulateTo(dayInYear, time);
+    }
+
+    private void FanControlProgram_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+      room_.SelectFanControl(fanControlProgram.Text);
     }
 
   }

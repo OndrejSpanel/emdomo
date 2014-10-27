@@ -35,7 +35,7 @@ namespace emDomoSim
       {
       }
 
-      public class State: WeatherSim.Weather
+      public class State : WeatherSim.Weather
       {
         public float roomTemperature_;
 
@@ -68,7 +68,7 @@ namespace emDomoSim
         const float oneDay = 24.0f;
         var ret = Simulate(deltaT);
         timeOfDay_ += deltaT;
-        while (timeOfDay_>oneDay)
+        while (timeOfDay_ > oneDay)
         {
           timeOfDay_ -= oneDay;
           dayInYear_++;
@@ -91,7 +91,7 @@ namespace emDomoSim
         fan_.Simulate(deltaT, this);
         if (fan_.FanStatus())
         {
-          result.roomTemperature_ += (weather.curTemp - result.roomTemperature_)*0.02f*deltaT;
+          result.roomTemperature_ += (weather.curTemp - result.roomTemperature_) * 0.02f * deltaT;
         }
         return result;
       }
@@ -154,7 +154,7 @@ namespace emDomoSim
         for (double f = 0; f < 24; f += 0.05)
         {
           Trace.WriteLine(String.Format("sim {0}", f));
-          Dispatcher.BeginInvoke((Action)delegate() {time.Value = f;});
+          Dispatcher.BeginInvoke((Action)delegate() { time.Value = f; });
           if (cancel_.WaitOne(20))
           {
             Trace.WriteLine("Cancel received");
@@ -165,7 +165,7 @@ namespace emDomoSim
         simulation_ = null;
         Trace.WriteLine("Ended");
 
-        Dispatcher.BeginInvoke((Action)delegate() { time.IsEnabled = true;});
+        Dispatcher.BeginInvoke((Action)delegate() { time.IsEnabled = true; });
 
       };
 
@@ -280,15 +280,20 @@ namespace emDomoSim
 
   }
 
-
   public class MyStrings : List<String>
   {
     public MyStrings()
     {
-      this.Add("Hello");
-      this.Add("Goodbye");
-      this.Add("Heya");
-      this.Add("Cya");
+      string @namespace = "emDomoSim.FanControlPrograms";
+      var fanControls = (from lAssembly in AppDomain.CurrentDomain.GetAssemblies()
+                         from lType in lAssembly.GetTypes()
+                         where lType.Namespace == @namespace
+                         where typeof(FanControl).IsAssignableFrom(lType)
+                         select lType);
+      foreach (var fc in fanControls)
+      {
+        this.Add(fc.FullName.Split('.').Last());
+      }
     }
   }
 }

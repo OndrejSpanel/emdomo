@@ -27,7 +27,7 @@ namespace emDomoSim
       int dayInYear_;
       float timeOfDay_; //  in hours
 
-      FanControlThermostat fan_ = new FanControlThermostat();
+      FanControl fan_ = new FanControlPrograms.FanControlThermostat();
       WeatherSim weatherSim_ = new WeatherSim();
       State state_ = new State();
 

@@ -17,44 +17,61 @@ namespace emDomoSim
     void Simulate(float deltaT, FanControlInput input);
     bool FanStatus();
   }
-  public class FanControlThermostat : FanControl
+
+  namespace FanControlPrograms
   {
-    bool fan_;
 
-    const float roomTempOn = 13;
-    const float roomTempOff = 12;
-    const float tempDiffOn = 5;
-    const float tempDiffOff = 3;
+    public class FanControlAlwaysOn : FanControl
+    {
+      public void Simulate(float deltaT, FanControlInput input) { }
+      public bool FanStatus() { return true; }
+    }
 
-    public FanControlThermostat()
+    public class FanControlAlwaysOff : FanControl
     {
-      Reset();
+      public void Simulate(float deltaT, FanControlInput input) { }
+      public bool FanStatus() { return false; }
     }
-    public void Reset()
+
+    public class FanControlThermostat : FanControl
     {
-      fan_ = false;
-    }
-    public void Simulate(float deltaT, FanControlInput input)
-    {
-      float roomTemp = input.GetRoomTemperature();
-      float outTemp = input.GetOutsideTemperature();
-      if (fan_)
+      bool fan_;
+
+      const float roomTempOn = 13;
+      const float roomTempOff = 12;
+      const float tempDiffOn = 5;
+      const float tempDiffOff = 3;
+
+      public FanControlThermostat()
       {
-        if (roomTemp < roomTempOff || roomTemp - outTemp < tempDiffOff)
+        Reset();
+      }
+      public void Reset()
+      {
+        fan_ = false;
+      }
+      public void Simulate(float deltaT, FanControlInput input)
+      {
+        float roomTemp = input.GetRoomTemperature();
+        float outTemp = input.GetOutsideTemperature();
+        if (fan_)
         {
-          fan_ = false;
+          if (roomTemp < roomTempOff || roomTemp - outTemp < tempDiffOff)
+          {
+            fan_ = false;
+          }
+        }
+        else
+        {
+          if (roomTemp > roomTempOn && roomTemp - outTemp > tempDiffOn)
+          {
+            fan_ = true;
+          }
+
         }
       }
-      else
-      {
-        if (roomTemp > roomTempOn && roomTemp - outTemp > tempDiffOn)
-        {
-          fan_ = true;
-        }
 
-      }
+      public bool FanStatus() { return fan_; }
     }
-
-    public bool FanStatus() {return fan_;}
   }
 }

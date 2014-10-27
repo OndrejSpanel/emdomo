@@ -37,7 +37,12 @@ namespace emDomoSim
 
       public void SelectFanControl(string fcName)
       {
-      
+        var fullFcName = "emDomoSim.FanControlPrograms." + fcName;
+        var fanControl = Activator.CreateInstance(Type.GetType(fullFcName));
+        if (fanControl is FanControl)
+        {
+          fan_ = (FanControl)fanControl;
+        }
       }
       public class State : WeatherSim.Weather
       {
@@ -282,8 +287,9 @@ namespace emDomoSim
       SimulateTo(dayInYear, time);
     }
 
-    private void FanControlProgram_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void FanControlProgram_DropDownClosed(Object sender, EventArgs e)
     {
+      //string text = (e.AddedItems[0] as ComboBoxItem).Content as string; 
       room_.SelectFanControl(fanControlProgram.Text);
     }
 

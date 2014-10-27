@@ -289,9 +289,9 @@ namespace emDomoSim
 
   }
 
-  public class MyStrings : List<String>
+  public class MyFanControls : List<String>
   {
-    public MyStrings()
+    public MyFanControls()
     {
       string @namespace = "emDomoSim.FanControlPrograms";
       var fanControls = (from lAssembly in AppDomain.CurrentDomain.GetAssemblies()

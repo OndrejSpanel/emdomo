@@ -203,6 +203,13 @@ namespace emDomoSim
 
       float deltaT = 0.05f;
       var room = new RoomSimulator();
+
+      var fanControlName = fanControlProgram.Text;
+      if (!String.IsNullOrEmpty(fanControlName))
+      {
+        room.SelectFanControl(fanControlProgram.Text);
+      }
+      
       room.SetTime(dayInYear, 0);
       for (float t = 0; t < 24.0f * warmUpDays; t += deltaT)
       {

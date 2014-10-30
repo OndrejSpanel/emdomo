@@ -19,6 +19,10 @@ namespace emDomoSim
     {
     }
 
+    public string FanControlName()
+    {
+      return fan_.GetType().FullName.Split('.').Last();
+    }
     public void SelectFanControl(string fcName)
     {
       if (String.IsNullOrEmpty(fcName)) return;

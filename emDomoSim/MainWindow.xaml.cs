@@ -31,6 +31,8 @@ namespace emDomoSim
     public MainWindow()
     {
       InitializeComponent();
+
+      fanControlProgram.Text = room_.FanControlName();
     }
 
     private void CancelSimulation()

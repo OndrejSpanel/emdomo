@@ -12,10 +12,11 @@ namespace emDomoSim
     float GetRoomTemperature();
   };
 
-  interface FanControl
+  public interface FanControl
   {
     void Simulate(float deltaT, FanControlInput input);
     bool FanStatus();
+    string Name();
   }
 
   namespace FanControlPrograms
@@ -25,16 +26,20 @@ namespace emDomoSim
     {
       public void Simulate(float deltaT, FanControlInput input) { }
       public bool FanStatus() { return true; }
+      public string Name() { return "Always On";}
     }
 
     public class FanControlAlwaysOff : FanControl
     {
       public void Simulate(float deltaT, FanControlInput input) { }
       public bool FanStatus() { return false; }
+      public string Name() { return "Always Off"; }
     }
 
     public class FanControlThermostat : FanControl
     {
+      public string Name() { return "Thermostat"; }
+
       bool fan_;
 
       const float roomTempOn = 13;

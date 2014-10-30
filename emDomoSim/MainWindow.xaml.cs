@@ -14,6 +14,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Diagnostics;
+using System.Globalization;
+using System.Windows.Markup;
 
 namespace emDomoSim
 {
@@ -93,16 +95,11 @@ namespace emDomoSim
       simulation_.Start();
     }
 
-    private void SimulateDays(int days)
+    private SimulationResults.FanControlResults SimulateDays(FanControl fc, int days)
     {
       float duration = 24.0f * days;
 
       //DoSimulateDay();
-      // Instantiate the dialog box
-      var dlg = new SimulWindow();
-
-      // Configure the dialog box
-      dlg.Owner = this;
 
       int dayInYear = DayInYear();
 
@@ -114,9 +111,8 @@ namespace emDomoSim
       float deltaT = 0.05f;
       var room = new RoomSimulator();
 
-      var fanControlName = fanControlProgram.Text;
-      room.SelectFanControl(fanControlProgram.Text);
-      
+      room.SelectFanControl(fc);
+
       room.SetTime(dayInYear, 0);
       for (float t = 0; t < 24.0f * warmUpDays; t += deltaT)
       {
@@ -139,13 +135,30 @@ namespace emDomoSim
         minTemp = Math.Min(roomState.roomTemperature_, minTemp);
         sumFanOn += (room.FanStatus() ? 1 : 0) * deltaT;
       }
+      return new SimulationResults.FanControlResults(fc.Name(), sumTemp / nSamples, maxTemp - minTemp, sumFanOn * 100 / duration);
+    }
 
-      dlg.avgRoomTemp.Text = String.Format("{0:0.0} °C", sumTemp / nSamples);
-      dlg.tempOsc.Text = String.Format("{0:0.0} °C", maxTemp - minTemp);
+    private void SimulateDays(int days)
+    {
+      // Instantiate the dialog box
+      var dlg = new SimulWindow();
 
-      dlg.fanOnTime.Text = String.Format("{0:0} %", sumFanOn * 100 / duration);
+      // Configure the dialog box
+      dlg.Owner = this;
 
-      //dlg.DocumentMargin = this.documentTextBox.Margin;
+      var results = new SimulationResults();
+
+      var fcList = new FanControlsList();
+
+      foreach (var fc in fcList.Types())
+      {
+        var result = SimulateDays((FanControl)Activator.CreateInstance(fc), days);
+        results.Results.Add(result);
+      }
+
+
+      dlg.resultsGrid.ItemsSource = results.Results;
+
 
       // Open the dialog box modally 
       dlg.ShowDialog();
@@ -209,20 +222,46 @@ namespace emDomoSim
 
   }
 
-  public class MyFanControls : List<String>
+  public class FanControlsList
   {
-    public MyFanControls()
+    public IEnumerable<Type> Types()
     {
       string @namespace = "emDomoSim.FanControlPrograms";
-      var fanControls = (from lAssembly in AppDomain.CurrentDomain.GetAssemblies()
+      return (from lAssembly in AppDomain.CurrentDomain.GetAssemblies()
                          from lType in lAssembly.GetTypes()
                          where lType.Namespace == @namespace
                          where typeof(FanControl).IsAssignableFrom(lType)
                          select lType);
+
+    }
+    public List<String> Names()
+    {
+      var ret = new List<String>();
+      var fanControls = Types();
       foreach (var fc in fanControls)
       {
-        this.Add(fc.FullName.Split('.').Last());
+        ret.Add(fc.FullName.Split('.').Last());
       }
+      return ret;
+    }
+  }
+
+  public class FanControlsListToListString : MarkupExtension, IValueConverter
+  {
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+      var src = (FanControlsList)value;
+      return src.Names();
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+      return DependencyProperty.UnsetValue;
+    }
+
+    public override object ProvideValue(IServiceProvider serviceProvider)
+    {
+      return this;
     }
   }
 }

@@ -23,5 +23,16 @@ namespace emDomoSim
     {
       InitializeComponent();
     }
+
+    private void DataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+      /*
+      avgRoomTemp.Text = String.Format("{0:0.0} °C", sumTemp / nSamples);
+      tempOsc.Text = String.Format("{0:0.0} °C", maxTemp - minTemp);
+      
+      fanOnTime.Text = String.Format("{0:0} %", sumFanOn * 100 / duration);
+      */
+
+    }
   }
 }

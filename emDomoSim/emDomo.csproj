@@ -54,6 +54,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="FanControlPredictDay.cs" />
     <Compile Include="RoomSimulator.cs" />
     <Compile Include="SimulationResults.cs" />
     <Compile Include="SimulWindow.xaml.cs">

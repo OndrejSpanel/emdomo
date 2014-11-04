@@ -2,17 +2,42 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "emDomo", "emDomo.csproj", "{026DF1DA-3820-4981-8857-BA9248656EF7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C} = {FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThermoPredict", "ThermoPredict\ThermoPredict.vcxproj", "{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|Mixed Platforms = Debug|Mixed Platforms
+		Debug|Win32 = Debug|Win32
 		Release|Any CPU = Release|Any CPU
+		Release|Mixed Platforms = Release|Mixed Platforms
+		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{026DF1DA-3820-4981-8857-BA9248656EF7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{026DF1DA-3820-4981-8857-BA9248656EF7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{026DF1DA-3820-4981-8857-BA9248656EF7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{026DF1DA-3820-4981-8857-BA9248656EF7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{026DF1DA-3820-4981-8857-BA9248656EF7}.Debug|Win32.ActiveCfg = Debug|Any CPU
 		{026DF1DA-3820-4981-8857-BA9248656EF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{026DF1DA-3820-4981-8857-BA9248656EF7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{026DF1DA-3820-4981-8857-BA9248656EF7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{026DF1DA-3820-4981-8857-BA9248656EF7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{026DF1DA-3820-4981-8857-BA9248656EF7}.Release|Win32.ActiveCfg = Release|Any CPU
+		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
+		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}.Debug|Win32.Build.0 = Debug|Win32
+		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}.Release|Any CPU.ActiveCfg = Release|Win32
+		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}.Release|Mixed Platforms.ActiveCfg = Release|Win32
+		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}.Release|Win32.ActiveCfg = Release|Win32
+		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

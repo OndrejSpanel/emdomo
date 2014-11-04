@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -10,42 +11,24 @@ namespace emDomoSim
   {
     public class FanControlPredictDay: FanControl
     {
-      /// daytime (in hours)
-      float currDayTime;
+      [DllImport(
+              "..\\..\\Debug\\ThermoPredict.dll",
+              CharSet = CharSet.Ansi,
+              CallingConvention = CallingConvention.Cdecl)]
+      public static extern bool ThermoPredictSimulate(float deltaT, float outTemp, float roomTemp);
 
-      float sumTemp;
-      float sumDuration;
+      bool fan;
 
       public FanControlPredictDay()
       {
-        sumTemp = 0;
-        sumDuration = 0;
+        fan = false;
       }
+
       public void Simulate(float deltaT, FanControlInput input)
       {
-        var temp = input.GetOutsideTemperature();
-        // plot a curve, try to fit the history
-        if (sumDuration + deltaT >= 1)
-        {
-          float deltaTIn = 1-sumDuration;
-          float deltaTOut = sumDuration + deltaT - 1;
-          sumTemp += temp * deltaTIn;
-          float avgTemp = sumTemp;
-          sumTemp = deltaTOut;
-          sumDuration = 0;
-        }
-        else
-        {
-          sumTemp += temp*deltaT;
-          sumDuration += deltaT;
-
-        }
-        {
-          float avgTemp = sumTemp / sumDuration;
-
-        }
+        fan = ThermoPredictSimulate(deltaT, input.GetOutsideTemperature(), input.GetRoomTemperature());
       }
-      public bool FanStatus() { return currDayTime<6; }
+      public bool FanStatus() { return false; }
       public string Name() { return "Predict Day"; }
     }
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+//using ThermoPredictCLR;
 
 namespace emDomoSim
 {
@@ -12,7 +13,7 @@ namespace emDomoSim
     public class FanControlPredictDay: FanControl
     {
       [DllImport(
-              "..\\..\\Debug\\ThermoPredict.dll",
+              "ThermoPredict.dll",
               CharSet = CharSet.Ansi,
               CallingConvention = CallingConvention.Cdecl)]
       [return: MarshalAs(UnmanagedType.I1)]

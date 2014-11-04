@@ -23,6 +23,7 @@ Global
 		{026DF1DA-3820-4981-8857-BA9248656EF7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{026DF1DA-3820-4981-8857-BA9248656EF7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
 		{026DF1DA-3820-4981-8857-BA9248656EF7}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{026DF1DA-3820-4981-8857-BA9248656EF7}.Debug|Win32.Build.0 = Debug|Any CPU
 		{026DF1DA-3820-4981-8857-BA9248656EF7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{026DF1DA-3820-4981-8857-BA9248656EF7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{026DF1DA-3820-4981-8857-BA9248656EF7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU

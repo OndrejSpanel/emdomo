@@ -39,3 +39,15 @@ bool ThermoPredictSimulate(float deltaT, float outTemp, float roomTemp)
   }
   return lastTemp < 7;
 }
+
+/*
+namespace ThermoPredictCLR {
+  public ref class Wrapper {
+    bool Simulate(float deltaT, float outTemp, float roomTemp)
+    {
+      return ThermoPredictSimulate(deltaT,outTemp,roomTemp);
+    }
+
+  };
+}
+*/

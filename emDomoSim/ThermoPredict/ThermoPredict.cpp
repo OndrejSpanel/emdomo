@@ -11,6 +11,8 @@ float currDayTime;
 float sumTemp = 0;
 float sumDuration = 0;
 
+float lastTemp;
+
 THERMOPREDICT_API
 bool ThermoPredictSimulate(float deltaT, float outTemp, float roomTemp)
 {
@@ -32,7 +34,8 @@ bool ThermoPredictSimulate(float deltaT, float outTemp, float roomTemp)
   }
   {
     float avgTemp = sumTemp / sumDuration;
+    lastTemp = avgTemp;
 
   }
-  return false;
+  return lastTemp < 7;
 }

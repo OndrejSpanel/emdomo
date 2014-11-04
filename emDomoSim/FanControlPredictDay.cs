@@ -15,6 +15,7 @@ namespace emDomoSim
               "..\\..\\Debug\\ThermoPredict.dll",
               CharSet = CharSet.Ansi,
               CallingConvention = CallingConvention.Cdecl)]
+      [return: MarshalAs(UnmanagedType.I1)]
       public static extern bool ThermoPredictSimulate(float deltaT, float outTemp, float roomTemp);
 
       bool fan;
@@ -28,7 +29,7 @@ namespace emDomoSim
       {
         fan = ThermoPredictSimulate(deltaT, input.GetOutsideTemperature(), input.GetRoomTemperature());
       }
-      public bool FanStatus() { return false; }
+      public bool FanStatus() { return fan; }
       public string Name() { return "Predict Day"; }
     }
 

@@ -5,6 +5,9 @@
 #include "ThermoPredict.h"
 #include "math.h"
 
+#include <array>
+#include <algorithm>
+#include <numeric>
 
 /// daytime (in hours)
 float currDayTime;
@@ -13,6 +16,12 @@ float sumTemp = 0;
 float sumDuration = 0;
 
 float lastTemp;
+
+static const float houseTemp = 19.0f;
+
+/// assume house-room temperature influence linear to the temperature difference, measure the factor
+float houseInfluence = 0.1f;
+float fanInfluence = 0.2f;
 
 class History {
   static const int nValues = 48;
@@ -47,7 +56,44 @@ public:
   }
 };
 
+class WatchThermalFlow {
+  float timeElapsed;
+  float thermalFlow;
+  float lastTemp;
+  bool first;
+
+public:
+  WatchThermalFlow() {
+    Reset();
+  }
+
+  void Reset() {
+    thermalFlow = 0;
+    timeElapsed = 0;
+    first = true;
+    lastTemp = 0;
+  }
+
+  void AddSample(float deltaT, float currTemp, float flowDrive) {
+    if (first)
+    {
+      lastTemp = currTemp;
+      first = false;
+    }
+    thermalFlow += (currTemp-lastTemp)/flowDrive;
+    timeElapsed += deltaT;
+  }
+
+  float TimeElapsed() const {return timeElapsed;}
+
+  float Flow() const {return thermalFlow/timeElapsed;}
+};
+
 static History THistory;
+static WatchThermalFlow WatchFlow;
+static bool WatchingFan;
+
+static float Lerp(float y0, float y1, float x) {return y0+(y1-y0)*x;}
 
 THERMOPREDICT_API
 bool ThermoPredictSimulate(float deltaT, float outTemp, float roomTemp)
@@ -59,6 +105,7 @@ bool ThermoPredictSimulate(float deltaT, float outTemp, float roomTemp)
     float deltaTOut = sumDuration + deltaT - 1;
     sumTemp += outTemp * deltaTIn;
     float avgTemp = sumTemp;
+    lastTemp = avgTemp;
     sumTemp = deltaTOut;
     sumDuration = 0;
     THistory.AddTemp(avgTemp);
@@ -69,10 +116,37 @@ bool ThermoPredictSimulate(float deltaT, float outTemp, float roomTemp)
     sumDuration += deltaT;
 
   }
-  {
-    float avgTemp = sumTemp / sumDuration;
-    lastTemp = avgTemp;
 
+  bool fan = outTemp < 7;
+
+  // measure room / air influence
+  // assume temperature can be modeled by the following equation
+  // (beware: this is intentional simplification, in reality the out temperature is also influencing the room even with fan off, however that would lead to too complex system to solve)
+  // tRoomNew = tRoomOld + deltaT*(fanOnOff*(outTemp-roomTemp)*fanInfluence+houseInfluence*(houseTemp-roomTemp))
+  // measure response with fan on / off and try to estimate the factors
+  // with fan off the response is:
+  // tRoomNew = tRoomOld + deltaT*houseInfluence*(houseTemp-roomTemp)
+  // v v v 
+  // houseInfluence = (tRoomNew-tRoomOld)/(deltaT*(houseTemp-roomTemp))
+  if (fan!=WatchingFan) {
+    // evaluate last slope
+    if (WatchFlow.TimeElapsed()>2) {
+      float newInfluence = WatchFlow.Flow();
+      if (!WatchingFan) {
+        houseInfluence = Lerp(houseInfluence,newInfluence,0.2f);
+      } else {
+        fanInfluence = Lerp(fanInfluence,newInfluence,0.2f);
+      }
+
+    }
+    WatchingFan = fan;
+    WatchFlow.Reset();
   }
-  return lastTemp < 7;
+  if (!WatchingFan) {
+    WatchFlow.AddSample(deltaT,roomTemp,houseTemp-roomTemp);
+  } else {
+    // TODO: subtract result of house thermal flow
+    WatchFlow.AddSample(deltaT,roomTemp,outTemp-roomTemp);
+  }
+  return fan;
 }

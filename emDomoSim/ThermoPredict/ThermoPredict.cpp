@@ -20,8 +20,8 @@ float lastTemp;
 static const float houseTemp = 19.0f;
 
 /// assume house-room temperature influence linear to the temperature difference, measure the factor
-float houseInfluence = 0.1f;
-float fanInfluence = 0.2f;
+float houseInfluence = 1.0f;
+float fanInfluence = 0.5f;
 
 class History {
   static const int nValues = 48;
@@ -95,9 +95,17 @@ static bool WatchingFan;
 
 static float Lerp(float y0, float y1, float x) {return y0+(y1-y0)*x;}
 
+
+
+float EvaluateFanTime(float outTempCurr, float roomTemp) {
+  for (float time = 0; time<12; time += 0.2f) {
+    float outTemp = THistory.Forecast(outTempCurr,time);
+  }
+  return 0;
+}
+
 THERMOPREDICT_API
-bool ThermoPredictSimulate(float deltaT, float outTemp, float roomTemp)
-{
+bool ThermoPredictSimulate(float deltaT, float outTemp, float roomTemp) {
   // plot a curve, try to fit the history
   if (sumDuration + deltaT >= 1)
   {

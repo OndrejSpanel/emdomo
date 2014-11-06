@@ -3,7 +3,9 @@
 
 #include "stdafx.h"
 #include "ThermoPredict.h"
-#include "math.h"
+
+#include <math.h>
+#include <limits.h>
 
 #include <array>
 #include <algorithm>
@@ -18,6 +20,7 @@ float sumDuration = 0;
 float lastTemp;
 
 static const float houseTemp = 19.0f;
+static const float targetTemp = 10.0f;
 
 /// assume house-room temperature influence linear to the temperature difference, measure the factor
 float houseInfluence = 1.0f;
@@ -96,12 +99,38 @@ static bool WatchingFan;
 static float Lerp(float y0, float y1, float x) {return y0+(y1-y0)*x;}
 
 
-
-float EvaluateFanTime(float outTempCurr, float roomTemp) {
-  for (float time = 0; time<12; time += 0.2f) {
+bool DecideFan(float outTempCurr, float roomTemp) {
+  // build a histogram describing out temperature in the next 24 hours
+  float minTemp = FLT_MAX, maxTemp = FLT_MIN;
+  for (float time = 0; time<24; time += 0.1f) {
     float outTemp = THistory.Forecast(outTempCurr,time);
+    minTemp = std::min(minTemp,outTemp);
+    maxTemp = std::max(maxTemp,outTemp);
+
   }
-  return 0;
+  const int nHistogram = 100;
+  int histogram[nHistogram];
+  for (int i=0; i<nHistogram; i++) histogram[i] = 0;
+  float deltaT = 0.1f;
+  for (float time = 0; time<24; time += deltaT) {
+    float outTemp = THistory.Forecast(outTempCurr,time);
+    int percentil = int((outTemp-minTemp)*nHistogram/(maxTemp-minTemp));
+    percentil = std::max(0,std::min(percentil,nHistogram-1));
+    histogram[percentil]++;
+  }
+  // find limit temperature needed to turn on to reach the target temperature
+  float simulatedTemp = roomTemp;
+  for (int i=0; i<100; i++) {
+    float temp = i*(maxTemp-minTemp)/100+minTemp;
+    float time = histogram[i]*deltaT;
+    simulatedTemp += (temp-roomTemp)*time*fanInfluence;
+    if (simulatedTemp<=targetTemp)
+    {
+      return outTempCurr<=temp;
+    }
+  }
+
+  return outTempCurr<targetTemp;
 }
 
 THERMOPREDICT_API
@@ -125,7 +154,7 @@ bool ThermoPredictSimulate(float deltaT, float outTemp, float roomTemp) {
 
   }
 
-  bool fan = outTemp < 7;
+  bool fan = DecideFan(outTemp,roomTemp);
 
   // measure room / air influence
   // assume temperature can be modeled by the following equation

@@ -95,6 +95,8 @@ namespace emDomoSim
       simulation_.Start();
     }
 
+    enum OscState {Up,Down,None};
+
     private SimulationResults.FanControlResults SimulateDays(FanControl fc, int days)
     {
       float duration = 24.0f * days;
@@ -121,21 +123,49 @@ namespace emDomoSim
 
       int nSamples = 0;
       float sumTemp = 0;
-      float minTemp = float.MaxValue;
-      float maxTemp = float.MinValue;
       float sumFanOn = 0;
+      float sumTempOsc = 0;
+      float lastTemp = room.GetRoomTemperature();
+
+      float lastMin = lastTemp;
+      float lastMax = lastTemp;
+      OscState oscState = OscState.None;
+      float sumOsc = 0;
+      int nOsc = 0;
 
 
       for (float t = 0; t < duration; t += deltaT)
       {
         RoomSimulator.State roomState = room.AdvanceTime(deltaT);
         nSamples++;
-        sumTemp += roomState.roomTemperature_;
-        maxTemp = Math.Max(roomState.roomTemperature_, maxTemp);
-        minTemp = Math.Min(roomState.roomTemperature_, minTemp);
+        float temp = roomState.roomTemperature_;
+        sumTemp += temp;
+
+        if (temp > lastTemp)
+        {
+          if (oscState == OscState.Down)
+          {
+            lastMin = lastTemp;
+          }
+          oscState = OscState.Up;
+        }
+        else
+        {
+          if (oscState == OscState.Up)
+          {
+            lastMax = lastTemp;
+            sumOsc += lastMax - lastMin;
+            nOsc++;
+          }
+          oscState = OscState.Down;
+
+        }
+        sumTempOsc += Math.Abs(temp - lastTemp)/deltaT;
+        lastTemp = temp;
         sumFanOn += (room.FanStatus() ? 1 : 0) * deltaT;
       }
-      return new SimulationResults.FanControlResults(fc.Name(), sumTemp / nSamples, maxTemp - minTemp, sumFanOn * 100 / duration);
+      return new SimulationResults.FanControlResults(fc.Name(), sumTemp / nSamples, sumTempOsc / nSamples, sumFanOn * 100 / duration);
+      //return new SimulationResults.FanControlResults(fc.Name(), sumTemp / nSamples, sumOsc / nOsc, sumFanOn * 100 / duration);
     }
 
     private void SimulateDays(int days)

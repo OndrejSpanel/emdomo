@@ -103,7 +103,7 @@ namespace emDomoSim
 
       //DoSimulateDay();
 
-      int dayInYear = DayInYear();
+      int dayInYear = DayInYearInput();
 
       int warmUpDays = 7; // TODO: find shortest warm-up necessary, longer warm-up should make almost no difference
 
@@ -207,8 +207,9 @@ namespace emDomoSim
     */
     private void SimulateTo(int dayInYear, float time)
     {
-      float deltaT = room_.SetTime(dayInYear, time);
-      RoomSimulator.State roomState = room_.Simulate(deltaT);
+      //float deltaT =
+      var roomState = room_.SetTimeWithWarmUp(dayInYear, time, 7);
+      //RoomSimulator.State roomState = room_.Simulate(deltaT);
       fanStatus.Text = room_.FanStatus() ? "On" : "Off";
       TimeSpan ts = TimeSpan.FromHours(time);
       curTime.Text = ts.ToString(@"hh\:mm");
@@ -218,7 +219,17 @@ namespace emDomoSim
       roomTemp.Text = roomState.roomTemperature_.ToString("f1");
     }
 
-    private int DayInYear()
+    private void RefreshRoomState()
+    {
+      var roomState = room_.GetState();
+      fanStatus.Text = room_.FanStatus() ? "On" : "Off";
+      curTemp.Text = roomState.curTemp.ToString("f1");
+      minTemp.Text = roomState.minTemp.ToString("f1");
+      maxTemp.Text = roomState.maxTemp.ToString("f1");
+      roomTemp.Text = roomState.roomTemperature_.ToString("f1");
+
+    }
+    private int DayInYearInput()
     {
       try
       {
@@ -233,14 +244,15 @@ namespace emDomoSim
     private void Time_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
       float time = (float)e.NewValue;
-      int dayInYear = DayInYear();
+      int dayInYear = DayInYearInput();
       SimulateTo(dayInYear, time);
     }
 
     private void FanControlProgram_DropDownClosed(Object sender, EventArgs e)
     {
       //string text = (e.AddedItems[0] as ComboBoxItem).Content as string; 
-      room_.SelectFanControl(fanControlProgram.Text);
+      room_.SelectFanControlRecalc(fanControlProgram.Text);
+      RefreshRoomState();
     }
 
   }

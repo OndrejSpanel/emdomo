@@ -100,6 +100,7 @@ static float Lerp(float y0, float y1, float x) {return y0+(y1-y0)*x;}
 
 
 bool DecideFan(float outTempCurr, float roomTemp) {
+  if (roomTemp<=targetTemp) return false;
   // build a histogram describing out temperature in the next 24 hours
   float minTemp = FLT_MAX, maxTemp = FLT_MIN;
   for (float time = 0; time<24; time += 0.1f) {
@@ -121,7 +122,7 @@ bool DecideFan(float outTempCurr, float roomTemp) {
   // find limit temperature needed to turn on to reach the target temperature
   float simulatedTemp = roomTemp;
   for (int i=0; i<100; i++) {
-    float temp = i*(maxTemp-minTemp)/100+minTemp;
+    float temp = (i+1)*(maxTemp-minTemp)/100+minTemp;
     float time = histogram[i]*deltaT;
     simulatedTemp += (temp-roomTemp)*time*fanInfluence;
     if (simulatedTemp<=targetTemp)

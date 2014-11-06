@@ -37,6 +37,12 @@ namespace emDomoSim
         fan_ = (FanControl)fanControl;
       }
     }
+    public void SelectFanControlRecalc(string fcName)
+    {
+      SelectFanControl(fcName);
+      SetTimeWithWarmUp(dayInYear_, timeOfDay_, 7, true);
+    }
+
     public class State : WeatherSim.Weather
     {
       public float roomTemperature_;
@@ -65,14 +71,24 @@ namespace emDomoSim
       return delta;
     }
 
-    public void SetTimeWithWarmUp(int dayInYear, float timeOfDay, int warmUpDays)
+    public State SetTimeWithWarmUp(int dayInYear, float timeOfDay, int warmUpDays, bool forceWarmUp=false)
     {
-      int dayInYearWarmUp = dayInYear-warmUpDays;
+      if (!forceWarmUp)
+      {
+        float dt = SetTime(dayInYear, timeOfDay);
+        if (dt > 0 && dt < 0.2f)
+        {
+          return Simulate(dt);
+        }
+
+      }
+
+      int dayInYearWarmUp = dayInYear - warmUpDays;
       if (dayInYearWarmUp < 0) dayInYearWarmUp += 366;
 
-      float deltaT = 0.05f;
-
       SetTime(dayInYearWarmUp, timeOfDay);
+
+      float deltaT = 0.05f;
       for (float t = 0; t < 24.0f * warmUpDays; t += deltaT)
       {
         AdvanceTime(deltaT);
@@ -80,6 +96,7 @@ namespace emDomoSim
 
       // warm up may cause some rounding errors, eliminate them by setting the time again
       SetTime(dayInYear, timeOfDay);
+      return state_;
     }
     public State AdvanceTime(float deltaT)
     {
@@ -103,16 +120,18 @@ namespace emDomoSim
       // simulate how the room responds
       float houseTemperature = 20;
       float houseWeight = 0.9f;
+      fan_.Simulate(deltaT, this);
       float ambientTemperature = (weather.curTemp * (1 - houseWeight) + houseTemperature * houseWeight);
       result.roomTemperature_ += (ambientTemperature - result.roomTemperature_) * 0.007f * deltaT;
-      state_ = result;
-      fan_.Simulate(deltaT, this);
       if (fan_.FanStatus())
       {
         result.roomTemperature_ += (weather.curTemp - result.roomTemperature_) * 0.02f * deltaT;
       }
+      state_ = result;
       return result;
     }
+
+    public State GetState() { return state_; }
 
     public float GetOutsideTemperature() { return state_.curTemp; }
     public float GetRoomTemperature() { return state_.roomTemperature_; }

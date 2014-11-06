@@ -107,19 +107,12 @@ namespace emDomoSim
 
       int warmUpDays = 7; // TODO: find shortest warm-up necessary, longer warm-up should make almost no difference
 
-      dayInYear -= warmUpDays;
-      if (dayInYear < 0) dayInYear += 366;
-
-      float deltaT = 0.05f;
       var room = new RoomSimulator();
 
       room.SelectFanControl(fc);
+      room.SetTimeWithWarmUp(dayInYear, 0, warmUpDays);
 
-      room.SetTime(dayInYear, 0);
-      for (float t = 0; t < 24.0f * warmUpDays; t += deltaT)
-      {
-        room.AdvanceTime(deltaT);
-      }
+      float deltaT = 0.05f;
 
       int nSamples = 0;
       float sumTemp = 0;

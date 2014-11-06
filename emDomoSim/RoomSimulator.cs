@@ -57,14 +57,30 @@ namespace emDomoSim
     {
       const float maxDelta = 0.2f;
       float delta = timeOfDay - timeOfDay_;
-      if (dayInYear_ != dayInYear) delta = 0;
-      else if (delta < 0) delta = 0;
-      else if (delta > maxDelta) delta = maxDelta;
+      if (dayInYear_ != dayInYear) delta += (dayInYear - dayInYear_)*24;
+      if (delta < 0) delta = 0;
+      if (delta > maxDelta) delta = maxDelta;
       dayInYear_ = dayInYear;
       timeOfDay_ = timeOfDay;
       return delta;
     }
 
+    public void SetTimeWithWarmUp(int dayInYear, float timeOfDay, int warmUpDays)
+    {
+      int dayInYearWarmUp = dayInYear-warmUpDays;
+      if (dayInYearWarmUp < 0) dayInYearWarmUp += 366;
+
+      float deltaT = 0.05f;
+
+      SetTime(dayInYearWarmUp, timeOfDay);
+      for (float t = 0; t < 24.0f * warmUpDays; t += deltaT)
+      {
+        AdvanceTime(deltaT);
+      }
+
+      // warm up may cause some rounding errors, eliminate them by setting the time again
+      SetTime(dayInYear, timeOfDay);
+    }
     public State AdvanceTime(float deltaT)
     {
       const float oneDay = 24.0f;

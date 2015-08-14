@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "emDomo", "emDomo.csproj", "{026DF1DA-3820-4981-8857-BA9248656EF7}"
 	ProjectSection(ProjectDependencies) = postProject
 		{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C} = {FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}
@@ -8,7 +10,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "emDomo", "emDomo.csproj", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ThermoPredict", "ThermoPredict\ThermoPredict.vcxproj", "{FF11C36F-EB7E-4A38-A4B1-CECD18B9A12C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{257F5983-000A-4AFE-B1E6-89219B0DC30F}"
+	ProjectSection(SolutionItems) = preProject
+		Performance1.psess = Performance1.psess
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms

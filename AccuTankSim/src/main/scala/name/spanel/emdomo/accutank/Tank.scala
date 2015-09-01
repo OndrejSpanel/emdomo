@@ -1,5 +1,30 @@
 package name.spanel.emdomo.accutank
 
+import scala.util.control.Breaks._
+
+abstract class Simulated {
+  def simulate(implicit deltaT: Float): Simulated
+
+  def simulateLongTime(time: Float, deltaT: Float = 1): Simulated = {
+    var ret = this
+    var timeLeft = time
+    breakable {
+      while (true) {
+        if (timeLeft>deltaT) {
+          ret = ret.simulate(deltaT)
+          timeLeft = timeLeft - deltaT
+        }
+        else {
+          ret = ret.simulate(timeLeft)
+          break
+        }
+      }
+    }
+    ret
+
+  }
+}
+
 object Tank {
   /// returns power in Watts
   type HeatSource = Float => Float
@@ -14,7 +39,7 @@ object Tank {
 
 import Tank._
 
-class Tank(val mass: Float, val levelTemp: Vector[Float], val heatSources: HeatSourceList) {
+class Tank(val mass: Float, val levelTemp: Vector[Float], val heatSources: HeatSourceList) extends Simulated {
   def levelCount = levelTemp.size
   def bottomLevel = levelTemp.size - 1
   def levelMass = mass / levelCount

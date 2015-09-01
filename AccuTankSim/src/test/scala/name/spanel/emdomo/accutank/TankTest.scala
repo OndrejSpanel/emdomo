@@ -11,28 +11,17 @@ class TankTest extends FlatSpec with Matchers {
   val minute = 60f
   val hour = 60*minute
 
+  val initTemp = 30f
+  val tgtTemp = 75f
+  val retTemp = 40f
+
   implicit val custom = TolerantNumerics.tolerantDoubleEquality(eps)
 
-  def simulateTank(tank: Tank, time: Float, deltaT: Float = 1.0f) = {
-    var ret = tank
-    var timeLeft = time
-    breakable {
-      while (true) {
-        if (timeLeft>deltaT) {
-          ret = ret.simulate(deltaT)
-          timeLeft = timeLeft - deltaT
-        }
-        else {
-          ret = ret.simulate(timeLeft)
-          break
-        }
-      }
-    }
-    ret
+  def simulateTank(tank: Tank, time: Float) = {
+    tank.simulateLongTime(time).asInstanceOf[Tank] // TODO: remove cast
   }
 
   "Tank" can "be created" in {
-    val initTemp = 60.0f
     val tank = new Tank(100, 1, initTemp)
     tank.levelCount shouldBe 1
     tank.bottomLevel shouldBe 0
@@ -41,8 +30,6 @@ class TankTest extends FlatSpec with Matchers {
   }
 
   it should "be stable" in {
-    val initTemp = 60.0f
-
     var tank = new Tank(100, 10, initTemp)
     tank = simulateTank(tank, 100)
     tank.topTemperature shouldBe initTemp
@@ -50,8 +37,6 @@ class TankTest extends FlatSpec with Matchers {
   }
 
   it should "be heated by a bottom permanent source" in {
-    val initTemp = 30.0f
-
     var tank = new Tank(100, 10, initTemp)
     val heating: HeatSource = _ => 1000
     tank = tank.addHeatSource(tank.bottomLevel, heating)
@@ -61,8 +46,6 @@ class TankTest extends FlatSpec with Matchers {
   }
 
   "Bottom heater" should "stop heating once done" in {
-    val initTemp = 30f
-    val tgtTemp = 75f
     var tank = new Tank(100, 10, initTemp)
     val heating = new Heater(tgtTemp, 1000)
     tank = tank.addHeatSource(tank.bottomLevel, heating)
@@ -73,27 +56,24 @@ class TankTest extends FlatSpec with Matchers {
     tank.topTemperature shouldBe tgtTemp +- 1f
   }
 
-  "Middle heater" should "not heat bottom, while heating top faster" in {
-    val initTemp = 30f
-    val tgtTemp = 75f
+  def middleHeatedTank = {
     var tank = new Tank(100, 10, initTemp)
     val heating = new Heater(tgtTemp, 1000)
     tank = tank.addHeatSource(5, heating)
     tank = simulateTank(tank, 5*hour)
+    tank
+  }
+
+  "Middle heater" should "not heat bottom, while heating top faster" in {
+    var tank = middleHeatedTank
+
     tank.topTemperature should be > initTemp
     tank.topTemperature should be >= tgtTemp
     tank.botTemperature shouldBe initTemp
   }
 
   "Heated tank" should "provide warm water at top, but not infinitely" in {
-    val initTemp = 30f
-    val tgtTemp = 75f
-    val retTemp = 40f
-
-    var tank = new Tank(100, 10, initTemp)
-    val heating = new Heater(tgtTemp, 1000)
-    tank = tank.addHeatSource(5, heating)
-    tank = simulateTank(tank, 5*hour)
+    var tank = middleHeatedTank
 
     val (pullWater, pullTank) = tank.pullTopLevel(retTemp)
     tank = pullTank
@@ -110,4 +90,19 @@ class TankTest extends FlatSpec with Matchers {
     tank.botTemperature shouldBe retTemp
   }
 
+  "Heated tank" should "provide power to consume, but not infinitely" in {
+
+    var tank = middleHeatedTank
+
+    var consumableTank = TankWithConsumption(tank, ConsumeTank(retTemp), () => 900f )
+    consumableTank = consumableTank.simulateLongTime(1*hour).asInstanceOf[TankWithConsumption]
+
+    consumableTank.tank.topTemperature should be >= tgtTemp
+    consumableTank.tank.botTemperature should be <= retTemp
+
+    consumableTank = consumableTank.simulateLongTime(10*hour).asInstanceOf[TankWithConsumption]
+
+    consumableTank.tank.topTemperature should be <= retTemp
+    consumableTank.tank.botTemperature should be <= retTemp
+  }
 }

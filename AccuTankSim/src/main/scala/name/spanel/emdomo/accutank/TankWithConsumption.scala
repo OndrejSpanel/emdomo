@@ -4,7 +4,7 @@ import name.spanel.emdomo.accutank.Tank.kcal
 
 case class ConsumeTank(topMass: Float, topTemperature: Float, botMass: Float, botTemperature: Float) {
   def consumeMass(mass: Float) = {
-    require(mass < topMass)
+    require(mass <= topMass + 1e-5)
     copy(topMass = topMass - mass, botMass = botMass + mass)
   }
 
@@ -14,18 +14,25 @@ case class ConsumeTank(topMass: Float, topTemperature: Float, botMass: Float, bo
   }
 
   def consumableTime(power: Float, time: Float) = {
-    val mass = power * time / (kcal * (topTemperature - botTemperature))
-    if (mass <= topMass) {
-      time
+    if (topMass <= 0) {
+      0f
     } else {
-      time * topMass / mass
+      val mass = power * time / (kcal * (topTemperature - botTemperature))
+      if (mass <= topMass) {
+        time
+      } else {
+        time * topMass / mass
+      }
     }
-
   }
 }
 
-case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, consumption: () => Float) {
-  def simulate(time: Float): TankWithConsumption = {
+object ConsumeTank {
+  def apply(bottomTemp: Float): ConsumeTank = ConsumeTank(0, 0, 0, bottomTemp)
+}
+
+case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, consumption: () => Float)  extends Simulated {
+  def simulate(implicit time: Float): TankWithConsumption = {
     // first draw from consume water, once this is not available, fill consume water from a tank
     val power = consumption()
     val canTime = consumeTank.consumableTime(power, time)

@@ -2,7 +2,7 @@ package name.spanel.emdomo.accutank
 
 object Tank {
   /// returns power in Watts
-  type HeatSource = () => Float
+  type HeatSource = Float => Float
 
   case class HeatSourceList(sources: Vector[(Int, HeatSource)]) {
     def add(pos: Int, heatSource: HeatSource) = copy(sources = sources :+ pos -> heatSource)
@@ -33,8 +33,8 @@ class Tank(val mass: Float, val levelTemp: Vector[Float], val heatSources: HeatS
   private def setTemp(pos: Int, temp: Float) = copy(levelTemp = levelTemp.patch(pos, Seq(temp), 1))
 
   private def simulateHeatSource(pos: Int, heatSource: HeatSource)(implicit deltaT: Float)= {
-    val power = heatSource()
-    val resTemp = levelTemp(pos) + power * deltaT / kcal
+    val power = heatSource(levelTemp(pos))
+    val resTemp = levelTemp(pos) + power * deltaT / (kcal * levelMass)
     setTemp(pos, resTemp)
   }
 
@@ -54,7 +54,7 @@ class Tank(val mass: Float, val levelTemp: Vector[Float], val heatSources: HeatS
     if (upTemp>=downTemp) {
       this
     } else {
-      val transfer = (upTemp - downTemp)*deltaT*circulationCoef
+      val transfer = (downTemp - upTemp)*deltaT*circulationCoef
       setTemp(pos-1, upTemp + transfer).setTemp(pos, downTemp - transfer)
     }
   }

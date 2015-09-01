@@ -3,7 +3,7 @@ package name.spanel.emdomo.accutank
 import scala.util.control.Breaks._
 
 abstract class Simulated {
-  def simulate(implicit deltaT: Float): Simulated
+  def simulate(time: Float): Simulated
 
   def simulateLongTime(time: Float, deltaT: Float = 1): Simulated = {
     var ret = this
@@ -91,9 +91,9 @@ class Tank(val mass: Float, val levelTemp: Vector[Float], val heatSources: HeatS
     }
     ret
   }
-  def simulate(implicit deltaT: Float) = {
-    val h = simulateHeatSources
-    h.simulateCirculation
+  def simulate(time: Float) = {
+    val h = simulateHeatSources(time)
+    h.simulateCirculation(time)
   }
 
   private def shiftTopLevelOut(bottomTemp: Float) = {

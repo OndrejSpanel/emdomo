@@ -9,8 +9,15 @@ case class ConsumeTank(topMass: Float, topTemperature: Float, botMass: Float, bo
   }
 
   def consumePower(power: Float, time: Float) = {
-    val mass = power * time / (kcal * (topTemperature - botTemperature))
-    consumeMass(mass)
+    if (power*time==0) {
+      this
+    } else {
+      // cannot consume if there is no energy stored
+      // TODO: handle gracefully- no energy left to consume
+      assert(topTemperature > botTemperature)
+      val mass = power * time / (kcal * (topTemperature - botTemperature))
+      consumeMass(mass)
+    }
   }
 
   def consumableTime(power: Float, time: Float) = {
@@ -32,7 +39,7 @@ object ConsumeTank {
 }
 
 case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, consumption: () => Float)  extends Simulated {
-  def simulate(implicit time: Float): TankWithConsumption = {
+  def simulateConsumption(time: Float): TankWithConsumption = {
     // first draw from consume water, once this is not available, fill consume water from a tank
     val power = consumption()
     val canTime = consumeTank.consumableTime(power, time)
@@ -45,7 +52,12 @@ case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, consumption
       val (pullWater, pullTank) = tank.pullTopLevel(consumeTank.botTemperature)
       // fill a new ConsumeTank
       val fractionTank = TankWithConsumption(pullTank, consumeTank.copy(topTemperature = pullWater, topMass = pullTank.levelMass, botMass = 0), consumption)
-      fractionTank.simulate(time - canTime)
+      fractionTank.simulateConsumption(time - canTime)
     }
+  }
+  override def simulate(time: Float) = {
+    val simTank = tank.simulate(time)
+    copy(tank = simTank).simulateConsumption(time)
+
   }
 }

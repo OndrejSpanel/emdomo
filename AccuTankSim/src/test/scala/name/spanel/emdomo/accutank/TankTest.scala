@@ -94,7 +94,7 @@ class TankTest extends FlatSpec with Matchers {
 
     var tank = middleHeatedTank
 
-    var consumableTank = TankWithConsumption(tank, ConsumeTank(retTemp), () => 900f )
+    var consumableTank = TankWithConsumption(tank, ConsumeTank(retTemp), () => 1900f )
     consumableTank = consumableTank.simulateLongTime(1*hour).asInstanceOf[TankWithConsumption]
 
     consumableTank.tank.topTemperature should be >= tgtTemp

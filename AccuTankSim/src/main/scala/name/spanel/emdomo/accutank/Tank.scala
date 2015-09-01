@@ -9,7 +9,7 @@ object Tank {
   }
 
   val kcal = 4184.0f // https://en.wikipedia.org/wiki/Calorie
-  val circulationCoef = 1.0f // empirical, how much is transferred per second / degree
+  val circulationCoef = 0.1f // empirical, how much is transferred per second / degree
 }
 
 import Tank._

@@ -9,6 +9,7 @@ object Tank {
   }
 
   val kcal = 4184.0f // https://en.wikipedia.org/wiki/Calorie
+  val circulationCoef = 1.0f // empirical, how much is transferred per second / degree
 }
 
 import Tank._
@@ -36,6 +37,8 @@ class Tank(val mass: Float, val levelTemp: Vector[Float], val heatSources: HeatS
     val resTemp = levelTemp(pos) + power * deltaT / kcal
     setTemp(pos, resTemp)
   }
+
+  // heat sources are applied at their position
   private def simulateHeatSources(implicit deltaT: Float) = {
     var ret = this
     for (hs <- heatSources.sources) {
@@ -43,8 +46,25 @@ class Tank(val mass: Float, val levelTemp: Vector[Float], val heatSources: HeatS
     }
     ret
   }
+
+  private def simulateCirculationAtLevel(pos: Int)(implicit deltaT: Float) = {
+    require(pos>0)
+    val upTemp = levelTemp(pos-1)
+    val downTemp = levelTemp(pos)
+    if (upTemp>=downTemp) {
+      this
+    } else {
+      val transfer = (upTemp - downTemp)*deltaT*circulationCoef
+      setTemp(pos-1, upTemp + transfer).setTemp(pos, downTemp - transfer)
+    }
+  }
+  // warm water circulates from lower to higher levels
   private def simulateCirculation(implicit deltaT: Float) = {
-    this
+    var ret = this
+    for (l <- levelTemp.indices.tail) {
+      ret = ret.simulateCirculationAtLevel(l)
+    }
+    ret
   }
   def simulate(implicit deltaT: Float) = {
     val h = simulateHeatSources

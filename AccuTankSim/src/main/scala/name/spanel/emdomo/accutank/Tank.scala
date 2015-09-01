@@ -23,4 +23,15 @@ class Tank(val levels: Vector[Float], val heatSources: HeatSourceList) {
   def botTemperature = levels.last
 
   def addHeatSource(pos: Int, heatSource: HeatSource) = copy(heatSources = heatSources.add(pos,heatSource))
+
+  private def simulateHeatSources(implicit deltaT: Float) = {
+    this
+  }
+  private def simulateCirculation(implicit deltaT: Float) = {
+    this
+  }
+  def simulate(implicit deltaT: Float) = {
+    val h = simulateHeatSources
+    h.simulateCirculation
+  }
 }

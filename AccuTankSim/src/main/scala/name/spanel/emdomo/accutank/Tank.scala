@@ -70,4 +70,11 @@ class Tank(val mass: Float, val levelTemp: Vector[Float], val heatSources: HeatS
     val h = simulateHeatSources
     h.simulateCirculation
   }
+
+  private def shiftTopLevelOut(bottomTemp: Float) = {
+    copy(levelTemp = levelTemp.patch(0, Nil, 1) :+ bottomTemp)
+  }
+  def pullTopLevel(bottomTemp: Float) = {
+    (levelTemp(0), shiftTopLevelOut(bottomTemp))
+  }
 }

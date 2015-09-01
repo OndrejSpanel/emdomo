@@ -85,4 +85,29 @@ class TankTest extends FlatSpec with Matchers {
     tank.botTemperature shouldBe initTemp
   }
 
+  "Heated tank" should "provide warm water at top, but not infinitely" in {
+    val initTemp = 30f
+    val tgtTemp = 75f
+    val retTemp = 40f
+
+    var tank = new Tank(100, 10, initTemp)
+    val heating = new Heater(tgtTemp, 1000)
+    tank = tank.addHeatSource(5, heating)
+    tank = simulateTank(tank, 5*hour)
+
+    val (pullWater, pullTank) = tank.pullTopLevel(retTemp)
+    tank = pullTank
+
+    pullWater should be >= tgtTemp
+    tank.botTemperature shouldBe retTemp
+
+    for ( i <-0 until tank.levelCount) {
+      val (_, pullTank) = tank.pullTopLevel(retTemp)
+      tank = pullTank
+    }
+
+    tank.topTemperature shouldBe retTemp
+    tank.botTemperature shouldBe retTemp
+  }
+
 }

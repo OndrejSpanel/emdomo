@@ -94,7 +94,12 @@ class TankTest extends FlatSpec with Matchers {
 
     var tank = middleHeatedTank
 
-    var consumableTank = TankWithConsumption(tank, ConsumeTank(retTemp), () => 1900f )
+    val wantedPower = 1900f
+
+    class NotEnoughPower extends Exception
+
+    var consumableTank = TankWithConsumption(tank, ConsumeTank(retTemp), () => wantedPower , () => throw new NotEnoughPower)
+
     consumableTank = consumableTank.simulateLongTime(1*hour).asInstanceOf[TankWithConsumption]
 
     consumableTank.tank.topTemperature should be >= tgtTemp

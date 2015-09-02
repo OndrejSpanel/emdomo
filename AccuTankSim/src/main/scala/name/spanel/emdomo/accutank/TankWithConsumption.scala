@@ -9,7 +9,7 @@ case class ConsumeTank(topMass: Float, topTemperature: Float, botMass: Float, bo
   }
 
   def consumePower(power: Float, time: Float) = {
-    if (power*time==0) {
+    if (power * time == 0) {
       this
     } else {
       // cannot consume if there is no energy stored
@@ -21,7 +21,7 @@ case class ConsumeTank(topMass: Float, topTemperature: Float, botMass: Float, bo
   }
 
   def consumableTime(power: Float, time: Float) = {
-    if (topMass <= 0) {
+    if (topMass <= 0 || topTemperature <= botTemperature) {
       0f
     } else {
       val mass = power * time / (kcal * (topTemperature - botTemperature))
@@ -38,10 +38,10 @@ object ConsumeTank {
   def apply(bottomTemp: Float): ConsumeTank = ConsumeTank(0, 0, 0, bottomTemp)
 }
 
-case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, consumption: () => Float)  extends Simulated[TankWithConsumption] {
+case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, wantedPower: () => Float, outOfPower: () => Unit) extends Simulated[TankWithConsumption] {
   def simulateConsumption(time: Float): TankWithConsumption = {
     // first draw from consume water, once this is not available, fill consume water from a tank
-    val power = consumption()
+    val power = wantedPower()
     val canTime = consumeTank.consumableTime(power, time)
     if (canTime >= time) {
       val left = consumeTank.consumePower(power, time)
@@ -50,8 +50,11 @@ case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, consumption
       val check = consumeTank.consumePower(power, canTime)
       assert(check.topMass <= 1e-6)
       val (pullWater, pullTank) = tank.pullTopLevel(consumeTank.botTemperature)
+      if (pullWater<=consumeTank.botTemperature) {
+        outOfPower() // can throw exception, or handle the failure in any other way
+      }
       // fill a new ConsumeTank
-      val fractionTank = TankWithConsumption(pullTank, consumeTank.copy(topTemperature = pullWater, topMass = pullTank.levelMass, botMass = 0), consumption)
+      val fractionTank = copy(tank = pullTank, consumeTank = consumeTank.copy(topTemperature = pullWater, topMass = pullTank.levelMass, botMass = 0))
       fractionTank.simulateConsumption(time - canTime)
     }
   }

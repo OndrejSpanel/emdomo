@@ -7,18 +7,19 @@ import scala.reflect.runtime.universe._
 object AccuTankSim extends SimpleSwingApplication {
 
   class TankParameters {
-    val wantedPower = 8000f
-    val maxTemp = 75f
-    val retTemp = 30f
-    val initTemp = maxTemp
+    val slots = 50
 
-    val middlePower = 6000f
-    val bottomPower = 7500f
-    val tankVolume = 1000f
+    var wantedPower = 8000f
+    var maxTemp = 75f
+    var retTemp = 30f
+    var initTemp = maxTemp
+
+    var middlePower = 6000f
+    var bottomPower = 7500f
+    var tankVolume = 1000f
   }
 
   def simulateTank() = {
-    val slots = 50
     val pars = new TankParameters
 
     import pars._
@@ -67,7 +68,7 @@ object AccuTankSim extends SimpleSwingApplication {
     val rm = runtimeMirror(getClass.getClassLoader)
     val im = rm.reflect(cls)
     val r = typeOf[T].members.collect {
-      case s: TermSymbol if s.isVal || s.isVar =>
+      case s: TermSymbol if s.isVar =>
         val name = s.name.toString
         val value = im.reflectField(s).get
         process(name, value)

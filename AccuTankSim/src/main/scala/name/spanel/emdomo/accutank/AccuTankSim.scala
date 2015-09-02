@@ -1,10 +1,12 @@
 package name.spanel.emdomo.accutank
 
+import java.awt.Dimension
 import javax.swing.UIManager
 
 import scala.swing._
 import scala.swing.event.{EditDone, ButtonClicked}
 import scala.reflect.runtime.universe._
+import scala.language.implicitConversions
 
 object AccuTankSim extends SimpleSwingApplication {
 
@@ -77,25 +79,45 @@ object AccuTankSim extends SimpleSwingApplication {
   override def top = new MainFrame {
     title = "My Frame"
     contents = new ScrollPane() {
-      contents = new BoxPanel(Orientation.Vertical) {
+      contents = new BorderPanel {
 
-        contents ++= enumValues(pars, { (inst, sym) =>
-          new FlowPanel(FlowPanel.Alignment.Left)() {
-            val fName = sym.name.toString
-            val fValue = inst.reflectField(sym).get
-            contents += new Label(fName)
-            val field = new TextField(fValue.toString, 7)
-            contents += field
-            listenTo(field)
-            field.reactions += {
-              case EditDone(x) =>
-                // TODO: support other field types as well
-                inst.reflectField(sym).set(x.text.toFloat)
+        implicit class placeIntoLayout(c:BorderPanel#Constraints) {
+          def @> (comp:Component) = comp -> c
+        }
+        implicit def pair2Dimension(pair: (Int, Int)): Dimension = new Dimension(pair._1, pair._2)
+        import BorderPanel.Position._
+
+        layout += Center @> new BoxPanel(Orientation.Vertical) {
+
+          contents ++= enumValues(pars, { (inst, sym) =>
+            new FlowPanel(FlowPanel.Alignment.Left)() {
+              val fName = sym.name.toString
+              val fValue = inst.reflectField(sym).get
+              contents += new Label(fName)
+              val field = new TextField(fValue.toString, 7)
+              contents += field
+              listenTo(field)
+              field.reactions += {
+                case EditDone(x) =>
+                  // TODO: support other field types as well
+                  inst.reflectField(sym).set(x.text.toFloat)
+              }
             }
-          }
-        })
+          })
 
-        contents += new Button {
+        }
+
+        layout += East @> new Panel {
+          minimumSize = (50,150)
+          preferredSize = (100,150)
+          override protected def paintComponent(g: Graphics2D) = {
+            super.paintComponent(g)
+            val c = new java.awt.Color(150,150,80)
+            g.setColor(c)
+            g.fillRect(0, 0, size.width, size.height)
+          }
+        }
+        layout += South @> new  Button {
           text = "Simulate!"
           reactions += {
             case ButtonClicked(_) => simulateTank(pars)

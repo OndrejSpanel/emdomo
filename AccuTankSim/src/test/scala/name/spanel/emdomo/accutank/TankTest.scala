@@ -18,7 +18,7 @@ class TankTest extends FlatSpec with Matchers {
   implicit val custom = TolerantNumerics.tolerantDoubleEquality(eps)
 
   def simulateTank(tank: Tank, time: Float) = {
-    tank.simulateLongTime(time).asInstanceOf[Tank] // TODO: remove cast
+    tank.simulateLongTime(time)
   }
 
   "Tank" can "be created" in {

@@ -38,7 +38,7 @@ object ConsumeTank {
   def apply(bottomTemp: Float): ConsumeTank = ConsumeTank(0, 0, 0, bottomTemp)
 }
 
-case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, consumption: () => Float)  extends Simulated {
+case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, consumption: () => Float)  extends Simulated[TankWithConsumption] {
   def simulateConsumption(time: Float): TankWithConsumption = {
     // first draw from consume water, once this is not available, fill consume water from a tank
     val power = consumption()

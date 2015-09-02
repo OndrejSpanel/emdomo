@@ -100,14 +100,14 @@ class TankTest extends FlatSpec with Matchers {
 
     var consumableTank = TankWithConsumption(tank, ConsumeTank(retTemp), () => wantedPower , () => throw new NotEnoughPower)
 
-    consumableTank = consumableTank.simulateLongTime(1*hour).asInstanceOf[TankWithConsumption]
+    consumableTank = consumableTank.simulateLongTime(1*hour)
 
     consumableTank.tank.topTemperature should be >= tgtTemp
     consumableTank.tank.botTemperature should be <= retTemp
 
-    consumableTank = consumableTank.simulateLongTime(10*hour).asInstanceOf[TankWithConsumption]
+    intercept[NotEnoughPower] {
+      consumableTank = consumableTank.simulateLongTime(10*hour)
+    }
 
-    consumableTank.tank.topTemperature should be <= retTemp
-    consumableTank.tank.botTemperature should be <= retTemp
   }
 }

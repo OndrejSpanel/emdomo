@@ -1,7 +1,7 @@
 package name.spanel.emdomo.accutank
 
 import scala.swing._
-import scala.swing.event.ButtonClicked
+import scala.swing.event.{EditDone, ButtonClicked}
 import scala.reflect.runtime.universe._
 
 object AccuTankSim extends SimpleSwingApplication {
@@ -19,9 +19,7 @@ object AccuTankSim extends SimpleSwingApplication {
     var tankVolume = 1000f
   }
 
-  def simulateTank() = {
-    val pars = new TankParameters
-
+  def simulateTank(pars: TankParameters) = {
     import pars._
 
     var tank = new Tank(tankVolume, slots, initTemp)
@@ -44,7 +42,6 @@ object AccuTankSim extends SimpleSwingApplication {
 
     var tankConsume = new TankWithConsumption(tank, ConsumeTank(retTemp), () => wantedPower, () => println("Out of power"))
 
-
     val hour = 3600f
     val step = 60f // a minute step is enough
     for (i <- 0 until 10) {
@@ -64,14 +61,12 @@ object AccuTankSim extends SimpleSwingApplication {
 
   val pars = new TankParameters
 
-  def enumValues[T: TypeTag : reflect.ClassTag, R](cls: T, process: (String, Any) => R): Iterable[R] = {
+  def enumValues[T: TypeTag : reflect.ClassTag, R](cls: T, process: (InstanceMirror, TermSymbol) => R): Iterable[R] = {
     val rm = runtimeMirror(getClass.getClassLoader)
     val im = rm.reflect(cls)
     val r = typeOf[T].members.collect {
       case s: TermSymbol if s.isVar =>
-        val name = s.name.toString
-        val value = im.reflectField(s).get
-        process(name, value)
+        process(im, s)
     }
     r
   }
@@ -80,17 +75,26 @@ object AccuTankSim extends SimpleSwingApplication {
     title = "My Frame"
     contents = new BoxPanel(Orientation.Vertical) {
 
-      contents ++= enumValues(pars, { (fName, fValue) =>
+      contents ++= enumValues(pars, { (inst, sym) =>
         new FlowPanel(FlowPanel.Alignment.Left)() {
+          val fName = sym.name.toString
+          val fValue = inst.reflectField(sym).get
           contents += new Label(fName)
-          contents += new TextField(fValue.toString, 4)
+          val field = new TextField(fValue.toString, 4)
+          contents += field
+          listenTo(field)
+          field.reactions += {
+            case EditDone(x) =>
+              // TODO: support other field types as well
+              inst.reflectField(sym).set(x.text.toFloat)
+          }
         }
       })
 
       contents += new Button {
         text = "Simulate!"
         reactions += {
-          case ButtonClicked(_) => simulateTank()
+          case ButtonClicked(_) => simulateTank(pars)
         }
       }
     }

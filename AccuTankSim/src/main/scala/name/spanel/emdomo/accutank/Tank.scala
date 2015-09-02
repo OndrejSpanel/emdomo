@@ -81,8 +81,10 @@ class Tank(val mass: Float, val levelTemp: Vector[Float], val heatSources: HeatS
     if (upTemp>=downTemp) {
       this
     } else {
-      val transfer = (downTemp - upTemp)*deltaT*circulationCoef
-      setTemp(pos-1, upTemp + transfer).setTemp(pos, downTemp - transfer)
+      val delta = downTemp - upTemp
+      val transfer = delta*deltaT*circulationCoef
+      val transferSaturated = transfer min delta*0.5f // assme the temperature can level at most (no mass "swap" assumed)
+      setTemp(pos-1, upTemp + transferSaturated).setTemp(pos, downTemp - transferSaturated)
     }
   }
   // warm water circulates from lower to higher levels

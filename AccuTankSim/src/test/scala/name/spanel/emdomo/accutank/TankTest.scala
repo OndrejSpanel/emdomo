@@ -3,7 +3,6 @@ package name.spanel.emdomo.accutank
 import name.spanel.emdomo.accutank.Tank.HeatSource
 import org.scalactic.TolerantNumerics
 import org.scalatest.{Matchers, FlatSpec}
-import scala.util.control.Breaks._
 
 class TankTest extends FlatSpec with Matchers {
 

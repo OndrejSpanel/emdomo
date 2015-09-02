@@ -47,14 +47,15 @@ case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, wantedPower
       copy(consumeTank = left)
     } else {
       val check = consumeTank.consumePower(power, canTime)
-      assert(check.topMass <= 1e-6)
       val (pullWater, pullTank) = tank.pullTopLevel(consumeTank.botTemperature)
-      if (pullWater<=consumeTank.botTemperature) {
-        outOfPower() // can throw exception, or handle the failure in any other way
-      }
       // fill a new ConsumeTank
       val fractionTank = copy(tank = pullTank, consumeTank = consumeTank.copy(topTemperature = pullWater, topMass = pullTank.levelMass, botMass = 0))
-      fractionTank.simulateConsumption(time - canTime)
+      if (pullWater<=consumeTank.botTemperature) {
+        outOfPower() // can throw exception, or handle the failure in any other way
+        fractionTank
+      } else {
+        fractionTank.simulateConsumption(time - canTime)
+      }
     }
   }
   override def simulate(time: Float) = {

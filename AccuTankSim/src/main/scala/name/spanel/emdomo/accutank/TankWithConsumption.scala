@@ -13,7 +13,6 @@ case class ConsumeTank(topMass: Float, topTemperature: Float, botMass: Float, bo
       this
     } else {
       // cannot consume if there is no energy stored
-      // TODO: handle gracefully- no energy left to consume
       assert(topTemperature > botTemperature)
       val mass = power * time / (kcal * (topTemperature - botTemperature))
       consumeMass(mass)

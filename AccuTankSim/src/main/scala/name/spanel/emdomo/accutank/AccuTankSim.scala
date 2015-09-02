@@ -1,5 +1,7 @@
 package name.spanel.emdomo.accutank
 
+import javax.swing.UIManager
+
 import scala.swing._
 import scala.swing.event.{EditDone, ButtonClicked}
 import scala.reflect.runtime.universe._
@@ -9,14 +11,15 @@ object AccuTankSim extends SimpleSwingApplication {
   class TankParameters {
     val slots = 50
 
-    var wantedPower = 8000f
+    var tankVolume = 1000f
+
     var maxTemp = 75f
     var retTemp = 30f
     var initTemp = maxTemp
 
+    var wantedPower = 8000f
     var middlePower = 6000f
     var bottomPower = 7500f
-    var tankVolume = 1000f
   }
 
   def simulateTank(pars: TankParameters) = {
@@ -64,7 +67,7 @@ object AccuTankSim extends SimpleSwingApplication {
   def enumValues[T: TypeTag : reflect.ClassTag, R](cls: T, process: (InstanceMirror, TermSymbol) => R): Iterable[R] = {
     val rm = runtimeMirror(getClass.getClassLoader)
     val im = rm.reflect(cls)
-    val r = typeOf[T].members.collect {
+    val r = typeOf[T].members.sorted.collect {
       case s: TermSymbol if s.isVar =>
         process(im, s)
     }
@@ -73,31 +76,37 @@ object AccuTankSim extends SimpleSwingApplication {
 
   override def top = new MainFrame {
     title = "My Frame"
-    contents = new BoxPanel(Orientation.Vertical) {
+    contents = new ScrollPane() {
+      contents = new BoxPanel(Orientation.Vertical) {
 
-      contents ++= enumValues(pars, { (inst, sym) =>
-        new FlowPanel(FlowPanel.Alignment.Left)() {
-          val fName = sym.name.toString
-          val fValue = inst.reflectField(sym).get
-          contents += new Label(fName)
-          val field = new TextField(fValue.toString, 4)
-          contents += field
-          listenTo(field)
-          field.reactions += {
-            case EditDone(x) =>
-              // TODO: support other field types as well
-              inst.reflectField(sym).set(x.text.toFloat)
+        contents ++= enumValues(pars, { (inst, sym) =>
+          new FlowPanel(FlowPanel.Alignment.Left)() {
+            val fName = sym.name.toString
+            val fValue = inst.reflectField(sym).get
+            contents += new Label(fName)
+            val field = new TextField(fValue.toString, 7)
+            contents += field
+            listenTo(field)
+            field.reactions += {
+              case EditDone(x) =>
+                // TODO: support other field types as well
+                inst.reflectField(sym).set(x.text.toFloat)
+            }
           }
-        }
-      })
+        })
 
-      contents += new Button {
-        text = "Simulate!"
-        reactions += {
-          case ButtonClicked(_) => simulateTank(pars)
+        contents += new Button {
+          text = "Simulate!"
+          reactions += {
+            case ButtonClicked(_) => simulateTank(pars)
+          }
         }
       }
     }
     size = new Dimension(300, 400)
+  }
+  override def startup(args: Array[String]) = {
+    UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName)
+    super.startup(args)
   }
 }

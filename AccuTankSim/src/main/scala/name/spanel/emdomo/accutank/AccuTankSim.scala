@@ -9,6 +9,7 @@ import scala.reflect.runtime.universe._
 import scala.language.implicitConversions
 
 object AccuTankSim extends SimpleSwingApplication {
+  implicit def pair2Dimension(pair: (Int, Int)): Dimension = new Dimension(pair._1, pair._2)
 
   class TankParameters {
     val slots = 50
@@ -22,6 +23,12 @@ object AccuTankSim extends SimpleSwingApplication {
     var wantedPower = 8000f
     var middlePower = 6000f
     var bottomPower = 7500f
+  }
+  val pars = new TankParameters
+
+  private lazy val tankPanel = new TankPanel {
+    minimumSize = (80, 150)
+    preferredSize = (120, 300)
   }
 
   def simulateTank(pars: TankParameters) = {
@@ -52,19 +59,22 @@ object AccuTankSim extends SimpleSwingApplication {
     for (i <- 0 until 10) {
       hdo.on = true
       tankConsume = tankConsume.simulateLongTime(9 * hour, step)
+      tankPanel.tank = tankConsume.tank
 
       hdo.on = false
       tankConsume = tankConsume.simulateLongTime(4 * hour, step)
+      tankPanel.tank = tankConsume.tank
 
       hdo.on = true
       tankConsume = tankConsume.simulateLongTime(7 * hour, step)
+      tankPanel.tank = tankConsume.tank
 
       hdo.on = false
       tankConsume = tankConsume.simulateLongTime(3 * hour, step)
+      tankPanel.tank = tankConsume.tank
     }
   }
 
-  val pars = new TankParameters
 
   def enumValues[T: TypeTag : reflect.ClassTag, R](cls: T, process: (InstanceMirror, TermSymbol) => R): Iterable[R] = {
     val rm = runtimeMirror(getClass.getClassLoader)
@@ -84,7 +94,6 @@ object AccuTankSim extends SimpleSwingApplication {
         implicit class placeIntoLayout(c:BorderPanel#Constraints) {
           def @> (comp:Component) = comp -> c
         }
-        implicit def pair2Dimension(pair: (Int, Int)): Dimension = new Dimension(pair._1, pair._2)
         import BorderPanel.Position._
 
         layout += Center @> new BoxPanel(Orientation.Vertical) {
@@ -107,10 +116,7 @@ object AccuTankSim extends SimpleSwingApplication {
 
         }
 
-        layout += East @> new TankPanel {
-          minimumSize = (50,150)
-          preferredSize = (100,150)
-        }
+        layout += East @> tankPanel
         layout += South @> new  Button {
           text = "Simulate!"
           reactions += {

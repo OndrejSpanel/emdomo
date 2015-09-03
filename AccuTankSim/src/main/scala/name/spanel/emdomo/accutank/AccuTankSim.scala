@@ -24,6 +24,7 @@ object AccuTankSim extends SimpleSwingApplication {
     var middlePower = 6000f
     var bottomPower = 7500f
   }
+
   val pars = new TankParameters
 
   private lazy val tankPanel = new TankPanel {
@@ -31,14 +32,15 @@ object AccuTankSim extends SimpleSwingApplication {
     preferredSize = (120, 300)
   }
 
-  def simulateTank(pars: TankParameters) = {
+  class HDOSwitch {
+    var on = false
+  }
+
+  def fromParameters(pars: TankParameters, hdo: HDOSwitch) = {
     import pars._
 
     var tank = new Tank(tankVolume, slots, initTemp)
 
-    class HDOSwitch {
-      var on = false
-    }
     class HDOHeater(temp: Float, power: Float, val hdo: HDOSwitch) extends Heater(temp, power) {
       override def apply(temp: Float) = {
         if (hdo.on) super.apply(temp)
@@ -46,32 +48,41 @@ object AccuTankSim extends SimpleSwingApplication {
       }
     }
 
-    val hdo = new HDOSwitch
     val middleHeat = new HDOHeater(maxTemp, middlePower, hdo)
     val bottomHeat = new HDOHeater(maxTemp, bottomPower, hdo)
     tank = tank.addHeatSource(slots / 2, middleHeat)
     tank = tank.addHeatSource(tank.bottomLevel, bottomHeat)
 
-    var tankConsume = new TankWithConsumption(tank, ConsumeTank(retTemp), () => wantedPower, () => println("Out of power"))
+    new TankWithConsumption(tank, ConsumeTank(retTemp), () => wantedPower, () => println("Out of power"))
+  }
 
-    val hour = 3600f
+  class TankSimulator(pars: TankParameters) {
+    val hdoSwitch = new HDOSwitch
+    var tankConsume = fromParameters(pars, hdoSwitch)
+
     val step = 60f // a minute step is enough
-    for (i <- 0 until 10) {
-      hdo.on = true
-      tankConsume = tankConsume.simulateLongTime(9 * hour, step)
-      tankPanel.tank = tankConsume.tank
 
-      hdo.on = false
-      tankConsume = tankConsume.simulateLongTime(4 * hour, step)
-      tankPanel.tank = tankConsume.tank
+    def hdo = hdoSwitch.on
+    def hdo_=(on: Boolean) = hdoSwitch.on = on
 
-      hdo.on = true
-      tankConsume = tankConsume.simulateLongTime(7 * hour, step)
-      tankPanel.tank = tankConsume.tank
+    def simulateStep(time: Float): Unit = {
+      tankConsume = tankConsume.simulateLongTime(time, step)
+    }
+  }
 
-      hdo.on = false
-      tankConsume = tankConsume.simulateLongTime(3 * hour, step)
-      tankPanel.tank = tankConsume.tank
+  val hdoTimes = List((0, 9), (13, 20))
+
+  def checkHDO(hour: Float) = {
+    hdoTimes.exists(r => r._1 <= hour && r._2 >= hour)
+  }
+
+  def simulateTank(pars: TankParameters) = {
+    val simulator = new TankSimulator(pars)
+    val hour = 3600f
+    for (i <- 0 until 24) {
+      simulator.hdo = checkHDO(i)
+      simulator.simulateStep(hour)
+      tankPanel.tank = simulator.tankConsume.tank
     }
   }
 
@@ -91,9 +102,10 @@ object AccuTankSim extends SimpleSwingApplication {
     contents = new ScrollPane() {
       contents = new BorderPanel {
 
-        implicit class placeIntoLayout(c:BorderPanel#Constraints) {
-          def @> (comp:Component) = comp -> c
+        implicit class placeIntoLayout(c: BorderPanel#Constraints) {
+          def @>(comp: Component) = comp -> c
         }
+
         import BorderPanel.Position._
 
         layout += Center @> new BoxPanel(Orientation.Vertical) {
@@ -117,7 +129,7 @@ object AccuTankSim extends SimpleSwingApplication {
         }
 
         layout += East @> tankPanel
-        layout += South @> new  Button {
+        layout += South @> new Button {
           text = "Simulate!"
           reactions += {
             case ButtonClicked(_) => simulateTank(pars)

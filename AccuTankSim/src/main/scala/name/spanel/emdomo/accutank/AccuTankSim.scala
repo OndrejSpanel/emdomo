@@ -77,7 +77,7 @@ object AccuTankSim extends SimpleSwingApplication {
   }
 
   override def top = new MainFrame {
-    title = "My Frame"
+    title = "Accumulation Tank Simulator"
     contents = new ScrollPane() {
       contents = new BorderPanel {
 

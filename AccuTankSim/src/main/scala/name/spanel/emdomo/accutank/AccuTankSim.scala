@@ -73,7 +73,7 @@ object AccuTankSim extends SimpleSwingApplication {
   val hdoTimes = List((0, 9), (13, 20))
 
   def checkHDO(hour: Float) = {
-    hdoTimes.exists(r => r._1 <= hour && r._2 >= hour)
+    hdoTimes.exists(r => r._1 <= hour && r._2 > hour)
   }
 
   def simulateTank(pars: TankParameters) = {

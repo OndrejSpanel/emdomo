@@ -107,15 +107,9 @@ object AccuTankSim extends SimpleSwingApplication {
 
         }
 
-        layout += East @> new Panel {
+        layout += East @> new TankPanel {
           minimumSize = (50,150)
           preferredSize = (100,150)
-          override protected def paintComponent(g: Graphics2D) = {
-            super.paintComponent(g)
-            val c = new java.awt.Color(150,150,80)
-            g.setColor(c)
-            g.fillRect(0, 0, size.width, size.height)
-          }
         }
         layout += South @> new  Button {
           text = "Simulate!"

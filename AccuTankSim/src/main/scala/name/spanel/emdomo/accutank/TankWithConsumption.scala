@@ -37,21 +37,21 @@ object ConsumeTank {
   def apply(bottomTemp: Float): ConsumeTank = ConsumeTank(0, 0, 0, bottomTemp)
 }
 
-case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, wantedPower: () => Float, outOfPower: () => Unit) extends Simulated[TankWithConsumption] {
+case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, wantedPower: () => Float, isPower: (Boolean) => Unit) extends Simulated[TankWithConsumption] {
   def simulateConsumption(time: Float): TankWithConsumption = {
     // first draw from consume water, once this is not available, fill consume water from a tank
     val power = wantedPower()
     val canTime = consumeTank.consumableTime(power, time)
     if (canTime >= time) {
+      isPower(true)
       val left = consumeTank.consumePower(power, time)
       copy(consumeTank = left)
     } else {
-      val check = consumeTank.consumePower(power, canTime)
       val (pullWater, pullTank) = tank.pullTopLevel(consumeTank.botTemperature)
       // fill a new ConsumeTank
       val fractionTank = copy(tank = pullTank, consumeTank = consumeTank.copy(topTemperature = pullWater, topMass = pullTank.levelMass, botMass = 0))
       if (pullWater<=consumeTank.botTemperature) {
-        outOfPower() // can throw exception, or handle the failure in any other way
+        isPower(false) // can throw exception, or handle the failure in any other way
         fractionTank
       } else {
         fractionTank.simulateConsumption(time - canTime)

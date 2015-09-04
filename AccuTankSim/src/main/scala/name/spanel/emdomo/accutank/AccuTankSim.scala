@@ -41,6 +41,7 @@ object AccuTankSim extends SimpleSwingApplication {
         val done = s.simulateStep(10*60)
         tankPanel.tank = s.tankConsume.tank
         tankPanel.time = s.timeElapsed
+        tankPanel.power = s.reportState.powerOk
         tankPanel.repaint()
         if (done) timer.stop()
       }
@@ -60,7 +61,11 @@ object AccuTankSim extends SimpleSwingApplication {
     }
   }
 
-  def fromParameters(pars: TankParameters, hdo: HDOSwitch) = {
+  class ReportState {
+    var powerOk = false
+  }
+
+  def fromParameters(pars: TankParameters, hdo: HDOSwitch, state: ReportState) = {
     import pars._
 
     var tank = new Tank(tankVolume, slots, initTemp)
@@ -77,12 +82,13 @@ object AccuTankSim extends SimpleSwingApplication {
     tank = tank.addHeatSource(slots / 2, middleHeat)
     tank = tank.addHeatSource(tank.bottomLevel, bottomHeat)
 
-    new TankWithConsumption(tank, ConsumeTank(retTemp), () => wantedPower, () => println("Out of power"))
+    new TankWithConsumption(tank, ConsumeTank(retTemp), () => wantedPower, ok => state.powerOk = ok)
   }
 
   class TankSimulator(pars: TankParameters) {
     val hdoSwitch = new HDOSwitch
-    var tankConsume = fromParameters(pars, hdoSwitch)
+    val reportState = new ReportState
+    var tankConsume = fromParameters(pars, hdoSwitch, reportState)
 
     val step = 60f // a minute step is enough
     val timeToSimulate = 10*24*3600f

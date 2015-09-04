@@ -97,7 +97,7 @@ class TankTest extends FlatSpec with Matchers {
 
     class NotEnoughPower extends Exception
 
-    var consumableTank = TankWithConsumption(tank, ConsumeTank(retTemp), () => wantedPower , () => throw new NotEnoughPower)
+    var consumableTank = TankWithConsumption(tank, ConsumeTank(retTemp), () => wantedPower , ok => if (!ok) throw new NotEnoughPower)
 
     consumableTank = consumableTank.simulateLongTime(1*hour)
 

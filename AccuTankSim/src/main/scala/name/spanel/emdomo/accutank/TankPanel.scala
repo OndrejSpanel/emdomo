@@ -6,12 +6,8 @@ import scala.swing._
 class TankPanel extends Panel {
   private[this] var _tank: Option[Tank] = None
   private[this] var _time: Float = 0f
+  private[this] var _power: Boolean = false
 
-  def time: Float = _time
-
-  def time_=(value: Float): Unit = {
-    _time = value
-  }
 
   def tank = _tank
 
@@ -19,6 +15,17 @@ class TankPanel extends Panel {
     _tank = Some(value)
   }
 
+  def time: Float = _time
+
+  def time_=(value: Float): Unit = {
+    _time = value
+  }
+
+  def power: Boolean = _power
+
+  def power_=(value: Boolean): Unit = {
+    _power = value
+  }
 
   override protected def paintComponent(g: Graphics2D) = {
     import java.awt.{Color => JColor}
@@ -43,7 +50,7 @@ class TankPanel extends Panel {
           val hot = if (temp >= rTemp) 1
           else if (temp <= gTemp) 0
           else (temp - gTemp) / (rTemp - gTemp)
-          val hue = (1-hot)*(240f/360)
+          val hue = (1 - hot) * (240f / 360)
 
           val tc = JColor.getHSBColor(hue, 1, 0.7f)
           tc
@@ -65,6 +72,10 @@ class TankPanel extends Panel {
       val minute = (timeInDay - hour * 3600) / 60
 
       g.drawString(f"$day%.0f $hour%2.0f:${math.floor(minute)}%2.0f", 20, 300)
+
+      val color = if (power) JColor.green else JColor.darkGray
+      g.setColor(color)
+      g.fillRect(10, 10, 10, 10)
     }
   }
 }

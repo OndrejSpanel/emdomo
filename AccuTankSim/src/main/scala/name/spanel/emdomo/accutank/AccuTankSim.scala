@@ -40,6 +40,7 @@ object AccuTankSim extends SimpleSwingApplication {
       for (s <- simulator) {
         val done = s.simulateStep(10*60)
         tankPanel.tank = s.tankConsume.tank
+        tankPanel.time = s.timeElapsed
         tankPanel.repaint()
         if (done) timer.stop()
       }

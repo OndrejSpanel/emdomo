@@ -64,7 +64,7 @@ class TankTest extends FlatSpec with Matchers {
   }
 
   "Middle heater" should "not heat bottom, while heating top faster" in {
-    var tank = middleHeatedTank
+    val tank = middleHeatedTank
 
     tank.topTemperature should be > initTemp
     tank.topTemperature should be >= tgtTemp
@@ -91,7 +91,7 @@ class TankTest extends FlatSpec with Matchers {
 
   "Heated tank" should "provide power to consume, but not infinitely" in {
 
-    var tank = middleHeatedTank
+    val tank = middleHeatedTank
 
     val wantedPower = 1900f
 

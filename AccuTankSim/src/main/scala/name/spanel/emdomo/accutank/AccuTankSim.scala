@@ -96,12 +96,18 @@ object AccuTankSim extends SimpleSwingApplication {
     }
   }
 
-  def simulateTank(pars: TankParameters) = {
+  def simulateTank(pars: TankParameters): Unit = {
     simulator = Some(new TankSimulator(pars))
     timer.setRepeats(true)
     timer.start()
   }
 
+  def pause(): Unit = {
+    if (simulator.isDefined) {
+      if (timer.isRunning) timer.stop()
+      else timer.start()
+    }
+  }
 
   def enumValues[T: TypeTag : reflect.ClassTag, R](cls: T, process: (InstanceMirror, TermSymbol) => R): Iterable[R] = {
     val rm = runtimeMirror(getClass.getClassLoader)
@@ -145,10 +151,20 @@ object AccuTankSim extends SimpleSwingApplication {
         }
 
         layout += East @> tankPanel
-        layout += South @> new Button {
-          text = "Simulate!"
-          reactions += {
-            case ButtonClicked(_) => simulateTank(pars)
+
+        layout += South @> new FlowPanel(FlowPanel.Alignment.Left)() {
+
+          contents += new Button {
+            text = "Simulate!"
+            reactions += {
+              case ButtonClicked(_) => simulateTank(pars)
+            }
+          }
+          contents += new Button {
+            text = "Pause"
+            reactions += {
+              case ButtonClicked(_) => pause()
+            }
           }
         }
       }

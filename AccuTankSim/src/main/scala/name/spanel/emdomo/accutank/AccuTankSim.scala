@@ -1,7 +1,8 @@
 package name.spanel.emdomo.accutank
 
 import java.awt.Dimension
-import javax.swing.UIManager
+import java.awt.event.{ActionEvent, ActionListener}
+import javax.swing.{Timer, UIManager}
 
 import scala.swing._
 import scala.swing.event.{EditDone, ButtonClicked}
@@ -27,13 +28,35 @@ object AccuTankSim extends SimpleSwingApplication {
 
   val pars = new TankParameters
 
+  var simulator: Option[TankSimulator] = None
+
   private lazy val tankPanel = new TankPanel {
     minimumSize = (80, 150)
     preferredSize = (120, 300)
   }
 
+  class TimerCallback extends ActionListener {
+    override def actionPerformed(e: ActionEvent): Unit = {
+      for (s <- simulator) {
+        val done = s.simulateStep(10*60)
+        tankPanel.tank = s.tankConsume.tank
+        tankPanel.repaint()
+        if (done) timer.stop()
+      }
+    }
+  }
+
+  private lazy val timer = new Timer(100, new TimerCallback)
+
   class HDOSwitch {
+    val hdoTimes = List((0, 9), (13, 20))
     var on = false
+
+    def setTime(t: Float): Unit = {
+      val hour = t / 3600
+      val hourInDay = hour % 24
+      on = hdoTimes.exists(r => r._1 <= hourInDay && r._2 > hourInDay)
+    }
   }
 
   def fromParameters(pars: TankParameters, hdo: HDOSwitch) = {
@@ -61,29 +84,21 @@ object AccuTankSim extends SimpleSwingApplication {
     var tankConsume = fromParameters(pars, hdoSwitch)
 
     val step = 60f // a minute step is enough
+    val timeToSimulate = 10*24*3600f
+    var timeElapsed = 0f
 
-    def hdo = hdoSwitch.on
-    def hdo_=(on: Boolean) = hdoSwitch.on = on
-
-    def simulateStep(time: Float): Unit = {
+    def simulateStep(time: Float): Boolean = {
+      hdoSwitch.setTime(timeElapsed)
       tankConsume = tankConsume.simulateLongTime(time, step)
+      timeElapsed += time
+      timeElapsed >= timeToSimulate // once finished, return true
     }
-  }
-
-  val hdoTimes = List((0, 9), (13, 20))
-
-  def checkHDO(hour: Float) = {
-    hdoTimes.exists(r => r._1 <= hour && r._2 > hour)
   }
 
   def simulateTank(pars: TankParameters) = {
-    val simulator = new TankSimulator(pars)
-    val hour = 3600f
-    for (i <- 0 until 24) {
-      simulator.hdo = checkHDO(i)
-      simulator.simulateStep(hour)
-      tankPanel.tank = simulator.tankConsume.tank
-    }
+    simulator = Some(new TankSimulator(pars))
+    timer.setRepeats(true)
+    timer.start()
   }
 
 

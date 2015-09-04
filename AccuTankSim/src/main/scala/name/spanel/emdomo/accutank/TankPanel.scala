@@ -30,7 +30,10 @@ class TankPanel extends Panel {
 
     for (t <- _tank) {
       g.drawString(f"${t.topTemperature}%.1f °C", 20, 20)
-      g.drawString(f"${t.botTemperature}%.1f °C", 20, 250)
+      g.drawString(f"${t.levelTemp(t.levelCount/4)}%.1f °C", 20, 70)
+      g.drawString(f"${t.levelTemp(t.levelCount/2)}%.1f °C", 20, 120)
+      g.drawString(f"${t.levelTemp(t.levelCount*3/4)}%.1f °C", 20, 190)
+      g.drawString(f"${t.botTemperature}%.1f °C", 20, 240)
     }
     //for (l <-tank.levelTemp)
   }

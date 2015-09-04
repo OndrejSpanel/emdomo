@@ -102,11 +102,17 @@ object AccuTankSim extends SimpleSwingApplication {
     timer.start()
   }
 
-  def pause(): Unit = {
+  def pause(): Boolean = {
     if (simulator.isDefined) {
-      if (timer.isRunning) timer.stop()
-      else timer.start()
-    }
+      if (timer.isRunning) {
+        timer.stop()
+        false
+      }
+      else {
+        timer.start()
+        true
+      }
+    } else true
   }
 
   def enumValues[T: TypeTag : reflect.ClassTag, R](cls: T, process: (InstanceMirror, TermSymbol) => R): Iterable[R] = {
@@ -163,7 +169,11 @@ object AccuTankSim extends SimpleSwingApplication {
           contents += new Button {
             text = "Pause"
             reactions += {
-              case ButtonClicked(_) => pause()
+              case ButtonClicked(_) => if (pause()) {
+                text = "Pause"
+              } else {
+                text = "Resume"
+              }
             }
           }
         }

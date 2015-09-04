@@ -38,27 +38,15 @@ class TankPanel extends Panel {
       for ((l, i) <- t.levelTemp.zipWithIndex) {
         val h = 5
         def tempColor(temp: Float) = {
-          def blendColor(lo: JColor, hi: JColor, f: Float) = {
-            val invF = 1 - f
-            val red = lo.getRed * invF + hi.getRed * f
-            val green = lo.getGreen * invF + hi.getGreen * f
-            val blue = lo.getBlue * invF + hi.getBlue * f
-            val alpha = lo.getAlpha * invF + hi.getAlpha * f
-            new JColor(red.toInt, green.toInt, blue.toInt, alpha.toInt)
-          }
-
-
-
           val rTemp = 80f
           val gTemp = 20f
-          val rColor = JColor.red
-          val gColor = JColor.green
-          if (temp >= rTemp) rColor
-          else if (temp <= gTemp) gColor
-          else {
-            val f = (temp - gTemp) / (rTemp - gTemp)
-            blendColor(gColor, rColor, f)
-          }
+          val hot = if (temp >= rTemp) 1
+          else if (temp <= gTemp) 0
+          else (temp - gTemp) / (rTemp - gTemp)
+          val hue = (1-hot)*(240f/360)
+
+          val tc = JColor.getHSBColor(hue, 1, 0.7f)
+          tc
         }
         val tc = tempColor(l)
         g.setColor(tc)

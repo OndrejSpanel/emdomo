@@ -117,7 +117,7 @@ object AccuTankSim extends SimpleSwingApplication {
     contents = new ScrollPane() {
       contents = new BorderPanel {
 
-        implicit class placeIntoLayout(c: BorderPanel#Constraints) {
+        implicit class placeIntoLayout(c: Constraints) {
           def @>(comp: Component) = comp -> c
         }
 

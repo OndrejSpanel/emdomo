@@ -37,6 +37,14 @@ object ConsumeTank {
   def apply(bottomTemp: Float): ConsumeTank = ConsumeTank(0, 0, 0, bottomTemp)
 }
 
+/**
+  *
+  * @param tank whole tank
+  * @param consumeTank buffer used for power consumation
+  * @param wantedPower power we want to draw from the tank
+  * @param isPower callback - parameter indicated if the wanted power is available
+  */
+
 case class TankWithConsumption(tank: Tank, consumeTank: ConsumeTank, wantedPower: () => Float, isPower: (Boolean) => Unit) extends Simulated[TankWithConsumption] {
   def simulateConsumption(time: Float): TankWithConsumption = {
     // first draw from consume water, once this is not available, fill consume water from a tank

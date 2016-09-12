@@ -82,7 +82,7 @@ object AccuTankSim extends SimpleSwingApplication {
     tank = tank.addHeatSource(slots / 2, middleHeat)
     tank = tank.addHeatSource(tank.bottomLevel, bottomHeat)
 
-    new TankWithConsumption(tank, ConsumeTank(retTemp), () => wantedPower, ok => state.powerOk = ok)
+    TankWithConsumption(tank, ConsumeTank(retTemp), () => wantedPower, ok => state.powerOk = ok)
   }
 
   class TankSimulator(pars: TankParameters) {

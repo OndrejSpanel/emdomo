@@ -40,7 +40,7 @@ namespace emDomoSim
     {
       public string Name() { return "Thermostat"; }
 
-      bool fan_;
+      private bool fan_;
 
       const float roomTempOn = 13;
       const float roomTempOff = 12;
